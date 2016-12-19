@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Housemates</string>
-    <string name="welcome">Welcome to Housemates, login to start keeping track of your pad</string>
+    <string name="welcome">Come on in and start trackin your pad</string>
+    <string-array
+        name="settings">
+        <item>logout</item>
+        <item>do</item>
+        <item>you</item>
+        <item>feel</item>
+        <item>like</item>
+        <item>i</item>
+        <item>do</item>
+    </string-array>
 </resources>
