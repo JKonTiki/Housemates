@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Housemates</string>
+    <string name="welcome">Welcome to Housemates, login to start keeping track of your pad</string>
+</resources>

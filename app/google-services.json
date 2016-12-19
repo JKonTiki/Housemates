@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "990428388745",
+    "firebase_url": "https://housemates-13c1b.firebaseio.com",
+    "project_id": "housemates-13c1b",
+    "storage_bucket": "housemates-13c1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990428388745:android:f005490c1c76197e",
+        "android_client_info": {
+          "package_name": "com.jeremyfryd.housemates"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "990428388745-sti8pi4i8datm1h6js9aave6ok30uunq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jeremyfryd.housemates",
+            "certificate_hash": "753EB509E3D84FDBFA883F7F4C9B3B6E928C0EC2"
+          }
+        },
+        {
+          "client_id": "990428388745-j98fkintbod7e6la4d8ug8b6cbqfbpi3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZecVbeXhCj3nzqAKuhBKZvpDgLdwTb2I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "990428388745-j98fkintbod7e6la4d8ug8b6cbqfbpi3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
