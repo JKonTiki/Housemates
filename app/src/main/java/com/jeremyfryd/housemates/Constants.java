@@ -5,4 +5,9 @@ package com.jeremyfryd.housemates;
  */
 
 public class Constants {
+    public static final String FIREBASE_CHILD_HOUSES = "houses";
+    public static final String FIREBASE_CHILD_CODES = "codes";
+    public static final String FIREBASE_CHILD_ROOMMATES = "roommates";
+
+
 }

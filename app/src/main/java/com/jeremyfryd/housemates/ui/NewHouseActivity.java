@@ -1,6 +1,7 @@
 package com.jeremyfryd.housemates.ui;
 
-import android.content.IntentSender;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,21 +11,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.jeremyfryd.housemates.Manifest;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.jeremyfryd.housemates.Constants;
 import com.jeremyfryd.housemates.R;
+import com.jeremyfryd.housemates.models.House;
+import com.jeremyfryd.housemates.models.Roommate;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -33,11 +38,16 @@ public class NewHouseActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, com.google.android.gms.location.LocationListener{
     @Bind(R.id.useLocationButton) Button mUseLocationButton;
     @Bind(R.id.createHouseButton) Button mCreateHouseButton;
+    @Bind(R.id.latitudeTextView) TextView mLatitudeTextView;
+    @Bind(R.id.longitudeTextView) TextView mLongitudeTextView;
+    @Bind(R.id.nameEditText) EditText mHouseName;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private PendingResult<LocationSettingsResult> result;
     static final Integer LOCATION = 1;
     private FusedLocationProviderApi mFusedLocationProviderApi;
+    private String mLatitude;
+    private String mLongitude;
 
 
     @Override
@@ -47,14 +57,6 @@ public class NewHouseActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
         mUseLocationButton.setOnClickListener(this);
         mCreateHouseButton.setOnClickListener(this);
-
-//        if (mGoogleApiClient == null) {
-//            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .addConnectionCallbacks(this)
-//                    .addOnConnectionFailedListener(this)
-//                    .addApi(LocationServices.API)
-//                    .build();
-//        }
     }
 
     @Override
@@ -62,9 +64,39 @@ public class NewHouseActivity extends AppCompatActivity implements
         if (v == mUseLocationButton) {
             findLocation();
         } else if (v == mCreateHouseButton) {
-            Log.d("useLocationButton", String.valueOf(mUseLocationButton.getId()));
-            Log.d("view number", String.valueOf(v.getId()));
+            String houseName = mHouseName.getText().toString();
+            Log.d("housename", "test");
+            if ((mLatitude != null && mLongitude != null) && houseName.length() > 0){
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                Log.d("successAuthZone", user.getDisplayName());
 
+                DatabaseReference houseRef = FirebaseDatabase
+                        .getInstance()
+                        .getReference(Constants.FIREBASE_CHILD_HOUSES);
+                House house = new House(houseName, mLatitude, mLongitude);
+                DatabaseReference housePushRef = houseRef.push();
+                String housePushId = housePushRef.getKey();
+                house.setHouseId(housePushId);
+
+                DatabaseReference roommateRef = FirebaseDatabase
+                        .getInstance()
+                        .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
+                Roommate roommate = new Roommate(user.getDisplayName(), housePushId, user.getUid());
+                DatabaseReference roommatePushRef = roommateRef.push();
+                String roommatePushId = roommatePushRef.getKey();
+                roommate.setRoommateId(roommatePushId);
+
+                house.addRoommateId(roommate.getRoommateId());
+
+                roommatePushRef.setValue(roommate);
+                housePushRef.setValue(house);
+
+                Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
+                startActivity(intent);
+
+            } else{
+               Toast.makeText(NewHouseActivity.this, "Please enter name and location", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -110,14 +142,17 @@ public class NewHouseActivity extends AppCompatActivity implements
                 ActivityCompat.requestPermissions(NewHouseActivity.this, new String[]{permission}, requestCode);
             }
         } else {
-            Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(NewHouseActivity.this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
         }
         findLocation();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this, "location :"+location.getLatitude()+" , "+location.getLongitude(), Toast.LENGTH_SHORT).show();
+        mLatitude = String.valueOf(location.getLatitude());
+        mLongitude = String.valueOf(location.getLongitude());
+        mLatitudeTextView.setText("Latitude: " + mLatitude);
+        mLongitudeTextView.setText("Longitude: " + mLongitude);
     }
 
     @Override
