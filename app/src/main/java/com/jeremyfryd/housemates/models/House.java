@@ -12,7 +12,7 @@ public class House {
     private String latitude;
     private String longitude;
     private String code;
-    private ArrayList<String> roommates = new ArrayList<String>();
+    private List<String> roommates = new ArrayList<String>();
     private String houseId;
 
     public House(String name, String latitude, String longitude){
@@ -45,6 +45,10 @@ public class House {
 
     public String getCode() {
         return code;
+    }
+
+    public List<String> getRoommates(){
+        return roommates;
     }
 
     public void setCode(String code) {
