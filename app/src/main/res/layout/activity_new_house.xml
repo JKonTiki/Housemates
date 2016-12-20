@@ -33,24 +33,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp" />
 
-    <Button
-        android:id="@+id/useLocationButton"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:nextFocusDown="@+id/passwordEditText"
-        android:padding="10dp"
-        android:layout_marginBottom="75dp"
-        android:background="@color/colorPrimaryDark"
-        android:textColor="@android:color/white"
-        android:text="Use Current Location"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginStart="6dp"
-        android:layout_above="@+id/createUserButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <EditText
             android:id="@+id/nameEditText"
             android:layout_width="match_parent"
@@ -65,6 +47,21 @@
             android:textSize="20sp"
         android:layout_above="@+id/useLocationButton"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/useLocationButton"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:nextFocusDown="@+id/passwordEditText"
+        android:padding="10dp"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@android:color/white"
+        android:text="Use Current Location"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:layout_marginLeft="6dp"
+        android:layout_centerVertical="true"
         android:layout_alignParentStart="true" />
 
 </RelativeLayout>

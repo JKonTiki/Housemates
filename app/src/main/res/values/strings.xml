@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Housemates</string>
-    <string name="welcome">Come on in to track yo pad</string>
+    <string name="welcome">Come on in and track your pad</string>
     <string-array name="settings">
         <item>logout</item>
         <item>do</item>
@@ -11,6 +11,4 @@
         <item>do</item>
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
