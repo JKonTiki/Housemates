@@ -2,9 +2,11 @@ package com.jeremyfryd.housemates.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -48,6 +50,9 @@ public class NewHouseActivity extends AppCompatActivity implements
     private FusedLocationProviderApi mFusedLocationProviderApi;
     private String mLatitude;
     private String mLongitude;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private boolean locationUpdated;
 
 
     @Override
@@ -57,6 +62,9 @@ public class NewHouseActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
         mUseLocationButton.setOnClickListener(this);
         mCreateHouseButton.setOnClickListener(this);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mSharedPreferences.edit();
+        locationUpdated = false;
     }
 
     @Override
@@ -132,6 +140,15 @@ public class NewHouseActivity extends AppCompatActivity implements
                 mGoogleApiClient.connect();
             }
         }
+        if (locationUpdated == false){
+            if (mSharedPreferences.getString(Constants.PREFERENCES_LATITUDE_KEY, null) !=null && mSharedPreferences.getString(Constants.PREFERENCES_LONGITUDE_KEY, null)!= null){
+//                TODO this oughtta be a callback!
+                mLatitude = mSharedPreferences.getString(Constants.PREFERENCES_LATITUDE_KEY, null);
+                mLongitude = mSharedPreferences.getString(Constants.PREFERENCES_LONGITUDE_KEY, null);
+                mLatitudeTextView.setText("Latitude: " + mLatitude);
+                mLongitudeTextView.setText("Longitude: " + mLongitude);
+            }
+        }
     }
 
     public void askForPermission(String permission, Integer requestCode) {
@@ -151,8 +168,11 @@ public class NewHouseActivity extends AppCompatActivity implements
     public void onLocationChanged(Location location) {
         mLatitude = String.valueOf(location.getLatitude());
         mLongitude = String.valueOf(location.getLongitude());
+        mEditor.putString(Constants.PREFERENCES_LATITUDE_KEY, mLatitude).apply();
+        mEditor.putString(Constants.PREFERENCES_LONGITUDE_KEY, mLongitude).apply();
         mLatitudeTextView.setText("Latitude: " + mLatitude);
         mLongitudeTextView.setText("Longitude: " + mLongitude);
+        locationUpdated = true;
     }
 
     @Override
