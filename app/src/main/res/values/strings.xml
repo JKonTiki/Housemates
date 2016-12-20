@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Housemates</string>
-    <string name="welcome">Come on in and start trackin your pad</string>
-    <string-array
-        name="settings">
+    <string name="welcome">Come on in to track yo pad</string>
+    <string-array name="settings">
         <item>logout</item>
         <item>do</item>
         <item>you</item>
@@ -11,4 +10,7 @@
         <item>i</item>
         <item>do</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
