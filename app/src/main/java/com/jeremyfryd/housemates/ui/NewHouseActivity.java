@@ -73,10 +73,8 @@ public class NewHouseActivity extends AppCompatActivity implements
             findLocation();
         } else if (v == mCreateHouseButton) {
             String houseName = mHouseName.getText().toString();
-            Log.d("housename", "test");
             if ((mLatitude != null && mLongitude != null) && houseName.length() > 0){
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Log.d("successAuthZone", user.getDisplayName());
 
                 DatabaseReference houseRef = FirebaseDatabase
                         .getInstance()

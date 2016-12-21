@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_use_code"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.jeremyfryd.housemates.ui.UseCodeActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="To join a pre-existing house, ask a member for the secret passkey"
+        android:textColor="@color/colorPrimary"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:id="@+id/joinHouseHeader"
+        android:layout_marginTop="39dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:hint="Enter Code Here"
+        android:padding="10dp"
+        android:inputType="text"
+        android:textColor="@android:color/black"
+        android:textColorHint="@color/colorPrimary"
+        android:textSize="20sp"
+        android:id="@+id/editText"
+        android:layout_marginTop="134dp"
+        android:layout_below="@+id/joinHouseHeader"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimaryDark"
+        android:padding="5dp"
+        android:textSize="20sp"
+        android:id="@+id/button2"
+        android:layout_marginTop="57dp"
+        android:layout_below="@+id/editText"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

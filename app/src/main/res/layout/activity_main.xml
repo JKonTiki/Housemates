@@ -21,15 +21,41 @@
         android:id="@+id/userLogo"/>
 
     <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/house_icon"
+        android:id="@+id/addNewHouse"
+        android:layout_above="@+id/joinHouse"
+        android:layout_toEndOf="@+id/joinArrow"
+        android:layout_marginBottom="13dp" />
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/house_icon"
+        android:id="@+id/joinHouse"
+        android:layout_below="@+id/userLogo"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:background="@drawable/arrow"
+        android:id="@+id/joinArrow"
+        android:layout_alignBottom="@+id/joinHouse"
+        android:layout_alignStart="@+id/addNewPlus"
+        android:layout_marginBottom="8dp" />
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:background="@drawable/add_new"
-        android:id="@+id/addNewHouse"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:id="@+id/addNewPlus"
         android:layout_marginRight="6dp"
+        android:layout_alignBottom="@+id/addNewHouse"
+        android:layout_toStartOf="@+id/joinHouse"
         android:layout_marginEnd="6dp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginBottom="6dp" />
+
 
 </RelativeLayout>

@@ -21,7 +21,11 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     @Bind(R.id.userLogo) ImageView mUserLogo;
-    @Bind(R.id.addNewHouse) ImageView mAddNewHouse;
+    @Bind(R.id.addNewPlus) ImageView mAddNewPlusIcon;
+    @Bind(R.id.addNewHouse) ImageView mAddNewHouseIcon;
+    @Bind(R.id.joinArrow) ImageView mJoinArrowIcon;
+    @Bind(R.id.joinHouse) ImageView mJoinHouseIcon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,15 +33,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mUserLogo.setOnClickListener(this);
-        mAddNewHouse.setOnClickListener(this);
+        mAddNewPlusIcon.setOnClickListener(this);
+        mAddNewHouseIcon.setOnClickListener(this);
+        mJoinArrowIcon.setOnClickListener(this);
+        mJoinHouseIcon.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v){
         if (v == mUserLogo){
             logout();
-        } else if(v == mAddNewHouse){
+        } else if(v == mAddNewHouseIcon || v == mAddNewPlusIcon){
             Intent intent = new Intent(MainActivity.this, NewHouseActivity.class);
+            startActivity(intent);
+        } else if(v == mJoinArrowIcon || v == mJoinHouseIcon){
+            Intent intent = new Intent(MainActivity.this, UseCodeActivity.class);
             startActivity(intent);
         }
     }
