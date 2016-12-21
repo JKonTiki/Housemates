@@ -1,19 +1,22 @@
 package com.jeremyfryd.housemates.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by jeremy on 12/20/16.
  */
 
 public class Roommate {
     private String name;
-    private String houseId;
+    private List<String> houseIds= new ArrayList<String>();
     private String roommateId;
-    private String authId;
+    private String userId;
 
-    public Roommate(String name, String houseId, String authId){
+    public Roommate(String name, String houseId, String userId){
         this.name = name;
-        this.houseId = houseId;
-        this.authId = authId;
+        this.houseIds.add(houseId);
+        this.userId = userId;
     }
 
     public Roommate(){}
@@ -22,8 +25,12 @@ public class Roommate {
         return name;
     }
 
-    public String getHouseId(){
-        return houseId;
+    public List<String> getHouseId(){
+        return houseIds;
+    }
+
+    public void addHouseId(String houseId){
+        houseIds.add(houseId);
     }
 
     public String getRoommateId() {

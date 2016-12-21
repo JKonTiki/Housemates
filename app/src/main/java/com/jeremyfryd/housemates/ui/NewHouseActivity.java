@@ -23,8 +23,12 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jeremyfryd.housemates.Constants;
 import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
@@ -53,7 +57,6 @@ public class NewHouseActivity extends AppCompatActivity implements
     private boolean locationUpdated;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,7 @@ public class NewHouseActivity extends AppCompatActivity implements
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mSharedPreferences.edit();
         locationUpdated = false;
+//        TODO take in array of all house codes to check against in for loop below
     }
 
     @Override
@@ -71,30 +75,41 @@ public class NewHouseActivity extends AppCompatActivity implements
         if (v == mUseLocationButton) {
             findLocation();
         } else if (v == mCreateHouseButton) {
-            String houseName = mHouseName.getText().toString();
+            final String houseName = mHouseName.getText().toString();
             if ((mLatitude != null && mLongitude != null) && houseName.length() > 0){
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                DatabaseReference houseRef = FirebaseDatabase
-                        .getInstance()
-                        .getReference(Constants.FIREBASE_CHILD_HOUSES);
-                House house = new House(houseName, mLatitude, mLongitude, generateCode(houseRef));
-                DatabaseReference housePushRef = houseRef.child(house.getHouseCode());
-
-                DatabaseReference roommateRef = FirebaseDatabase
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                final String userId = user.getUid();
+               final DatabaseReference roommateRef = FirebaseDatabase
                         .getInstance()
                         .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
-                Roommate roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
-                DatabaseReference roommatePushRef = roommateRef.push();
-                String roommatePushId = roommatePushRef.getKey();
-                roommate.setRoommateId(roommatePushId);
 
-                house.addRoommateId(roommate.getRoommateId());
+                roommateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        final Roommate roommate;
+                        House house = new House(houseName, mLatitude, mLongitude, generateCode());
+                        DatabaseReference houseRef = FirebaseDatabase
+                                .getInstance()
+                                .getReference(Constants.FIREBASE_CHILD_HOUSES);
+                        DatabaseReference housePushRef = houseRef.child(house.getHouseCode());
+                        if (snapshot.hasChild(userId)) {
+                            roommate = snapshot.child(userId).getValue(Roommate.class);
+                            roommate.addHouseId(house.getHouseCode());
+                        } else{
+                            roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
+                        }                        DatabaseReference roommatePushRef = roommateRef.child(user.getUid());
 
-                housePushRef.setValue(house);
-                roommatePushRef.setValue(roommate);
+                        house.addRoommateId(roommate.getRoommateId());
 
-                Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
-                startActivity(intent);
+                        housePushRef.setValue(house);
+                        roommatePushRef.setValue(roommate);
+
+                        Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
 
             } else{
                Toast.makeText(NewHouseActivity.this, "Please enter name and location", Toast.LENGTH_SHORT).show();
@@ -102,7 +117,7 @@ public class NewHouseActivity extends AppCompatActivity implements
         }
     }
 
-    private String generateCode(DatabaseReference houseRef) {
+    private String generateCode() {
         String code = "";
         for (int i = 0; i < 6; i++){
             int randomNum = ThreadLocalRandom.current().nextInt(0, 35 + 1);
@@ -116,11 +131,11 @@ public class NewHouseActivity extends AppCompatActivity implements
             Log.d("ASCII number", String.valueOf(randomNum));
         }
         Log.d("code", code);
-        return checkCodeUniqueness(houseRef,code);
+        return checkCodeUniqueness(code);
     }
 
 
-    private String checkCodeUniqueness(DatabaseReference houseRef, String code) {
+    private String checkCodeUniqueness(String code) {
         boolean codeIsUnique = true;
 //        TODO call houses from database and ensure no matches take place
 //        final ArrayList<String> otherCodes = new ArrayList<String>();
@@ -133,7 +148,7 @@ public class NewHouseActivity extends AppCompatActivity implements
         if (codeIsUnique){
             return code;
         } else{
-            return generateCode(houseRef);
+            return generateCode();
         }
     }
 

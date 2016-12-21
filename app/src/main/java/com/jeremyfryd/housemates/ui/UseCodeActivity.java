@@ -61,6 +61,13 @@ public class UseCodeActivity extends AppCompatActivity implements View.OnClickLi
 
                             House house = snapshot.child(inputtedCode).getValue(House.class);
 
+
+
+//                            TODO check if roommate in house already AND if roommate exists at all
+
+
+
+
                             DatabaseReference roommateRef = FirebaseDatabase
                                     .getInstance()
                                     .getReference(Constants.FIREBASE_CHILD_ROOMMATES);

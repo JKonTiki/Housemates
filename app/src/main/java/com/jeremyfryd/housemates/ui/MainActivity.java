@@ -10,12 +10,17 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.jeremyfryd.housemates.Constants;
 import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
@@ -34,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ChildEventListener mChildEventListener;
     private ArrayList<House> mHouses= new ArrayList<House>();
     private ArrayList<Roommate> mRoommates= new ArrayList<Roommate>();
+    private DatabaseReference databaseRef;
+    private ChildEventListener roommatesListener;
+    private ChildEventListener housesListener;
 
 
     @Override
@@ -46,32 +54,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAddNewHouseIcon.setOnClickListener(this);
         mJoinArrowIcon.setOnClickListener(this);
         mJoinHouseIcon.setOnClickListener(this);
-//        mChildEventListener = new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                otherCodes.add(dataSnapshot.getValue(House.class).getCode());
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        };
+
+
+        databaseRef = FirebaseDatabase
+                .getInstance()
+                .getReference();
+        housesListener = databaseRef.child(Constants.FIREBASE_CHILD_HOUSES).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mHouses.add(dataSnapshot.getValue(House.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        roommatesListener = databaseRef.child(Constants.FIREBASE_CHILD_ROOMMATES).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mRoommates.add(dataSnapshot.getValue(Roommate.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -93,5 +133,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseRef.removeEventListener(housesListener);
+        databaseRef.removeEventListener(roommatesListener);
     }
 }
