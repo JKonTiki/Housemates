@@ -79,12 +79,11 @@ public class NewHouseActivity extends AppCompatActivity implements
                         .getReference(Constants.FIREBASE_CHILD_HOUSES);
                 House house = new House(houseName, mLatitude, mLongitude, generateCode(houseRef));
                 DatabaseReference housePushRef = houseRef.child(house.getHouseCode());
-                String housePushId = housePushRef.getKey();
 
                 DatabaseReference roommateRef = FirebaseDatabase
                         .getInstance()
                         .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
-                Roommate roommate = new Roommate(user.getDisplayName(), housePushId, user.getUid());
+                Roommate roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
                 DatabaseReference roommatePushRef = roommateRef.push();
                 String roommatePushId = roommatePushRef.getKey();
                 roommate.setRoommateId(roommatePushId);

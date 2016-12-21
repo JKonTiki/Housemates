@@ -164,6 +164,7 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+//TODO check if preexisting email and do forgot password
 
     private boolean isValidEmail(String email) {
         boolean isGoodEmail =
