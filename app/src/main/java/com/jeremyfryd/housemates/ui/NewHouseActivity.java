@@ -1,6 +1,5 @@
 package com.jeremyfryd.housemates.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,11 +18,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -32,6 +29,8 @@ import com.jeremyfryd.housemates.Constants;
 import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -45,7 +44,6 @@ public class NewHouseActivity extends AppCompatActivity implements
     @Bind(R.id.nameEditText) EditText mHouseName;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private PendingResult<LocationSettingsResult> result;
     static final Integer LOCATION = 1;
     private FusedLocationProviderApi mFusedLocationProviderApi;
     private String mLatitude;
@@ -53,6 +51,7 @@ public class NewHouseActivity extends AppCompatActivity implements
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private boolean locationUpdated;
+
 
 
     @Override
@@ -75,14 +74,12 @@ public class NewHouseActivity extends AppCompatActivity implements
             String houseName = mHouseName.getText().toString();
             if ((mLatitude != null && mLongitude != null) && houseName.length() > 0){
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
                 DatabaseReference houseRef = FirebaseDatabase
                         .getInstance()
                         .getReference(Constants.FIREBASE_CHILD_HOUSES);
-                House house = new House(houseName, mLatitude, mLongitude);
-                DatabaseReference housePushRef = houseRef.push();
+                House house = new House(houseName, mLatitude, mLongitude, generateCode(houseRef));
+                DatabaseReference housePushRef = houseRef.child(house.getHouseCode());
                 String housePushId = housePushRef.getKey();
-                house.setHouseId(housePushId);
 
                 DatabaseReference roommateRef = FirebaseDatabase
                         .getInstance()
@@ -94,8 +91,8 @@ public class NewHouseActivity extends AppCompatActivity implements
 
                 house.addRoommateId(roommate.getRoommateId());
 
-                roommatePushRef.setValue(roommate);
                 housePushRef.setValue(house);
+                roommatePushRef.setValue(roommate);
 
                 Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -103,6 +100,41 @@ public class NewHouseActivity extends AppCompatActivity implements
             } else{
                Toast.makeText(NewHouseActivity.this, "Please enter name and location", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private String generateCode(DatabaseReference houseRef) {
+        String code = "";
+        for (int i = 0; i < 6; i++){
+            int randomNum = ThreadLocalRandom.current().nextInt(0, 35 + 1);
+            if (randomNum < 10){
+                randomNum += 48;
+            } else{
+                randomNum += (65-10);
+            }
+            String randomCharacterString = Character.toString((char) randomNum);
+            code += randomCharacterString;
+            Log.d("ASCII number", String.valueOf(randomNum));
+        }
+        Log.d("code", code);
+        return checkCodeUniqueness(houseRef,code);
+    }
+
+
+    private String checkCodeUniqueness(DatabaseReference houseRef, String code) {
+        boolean codeIsUnique = true;
+//        TODO call houses from database and ensure no matches take place
+//        final ArrayList<String> otherCodes = new ArrayList<String>();
+//        for (int i=0; i<otherCodes.size(); i++){
+//            Log.d("firebase code i: ", otherCodes.get(i));
+//            if (otherCodes.get(i).equals(code)){
+//                codeIsUnique = false;
+//            }
+//        }
+        if (codeIsUnique){
+            return code;
+        } else{
+            return generateCode(houseRef);
         }
     }
 
@@ -190,4 +222,5 @@ public class NewHouseActivity extends AppCompatActivity implements
     public void onConnectionFailed(ConnectionResult connectionResult){
 
     }
+
 }

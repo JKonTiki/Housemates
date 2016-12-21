@@ -11,14 +11,14 @@ public class House {
     private String name;
     private String latitude;
     private String longitude;
-    private String code;
     private List<String> roommates = new ArrayList<String>();
-    private String houseId;
+    private String houseCode;
 
-    public House(String name, String latitude, String longitude){
+    public House(String name, String latitude, String longitude, String houseCode){
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.houseCode = houseCode;
     }
 
     public House(){}
@@ -35,24 +35,12 @@ public class House {
         return longitude;
     }
 
-    public String getHouseId() {
-        return houseId;
-    }
-
-    public void setHouseId(String pushId) {
-        this.houseId = pushId;
-    }
-
-    public String getCode() {
-        return code;
+    public String getHouseCode() {
+        return houseCode;
     }
 
     public List<String> getRoommates(){
         return roommates;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public void addRoommateId(String _id){
