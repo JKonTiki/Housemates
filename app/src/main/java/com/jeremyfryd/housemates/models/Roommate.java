@@ -26,7 +26,7 @@ public class Roommate {
         return name;
     }
 
-    public List<String> getHouseId(){
+    public List<String> getHouseIds(){
         return houseIds;
     }
 

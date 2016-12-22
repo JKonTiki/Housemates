@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Roommate mRoommate;
     private FirebaseUser mUser;
     private String mUserId;
+    private House mHouse;
+    private String mSingleHouseId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,19 +67,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .getInstance()
                 .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
 
-        DatabaseReference houseRef = FirebaseDatabase
-                .getInstance()
-                .getReference(Constants.FIREBASE_CHILD_HOUSES);
+        DatabaseReference roommateChildRef = roommateRef.child(mUserId);
 
-        roommateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        roommateChildRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.hasChild(mUserId)) {
-                    mRoommate = snapshot.child(mUserId).getValue(Roommate.class);
-                    Log.d("MAIN: already exists", mRoommate.getRoommateId());
+            public void onDataChange(DataSnapshot roommateSnapshot) {
+                if (roommateSnapshot.exists()) {
+                    mRoommate = roommateSnapshot.getValue(Roommate.class);
+                    if (mRoommate.getHouseIds().size()>0){
+                        mSingleHouseId = mRoommate.getHouseIds().get(0);
+
+                        DatabaseReference houseRef = FirebaseDatabase
+                                .getInstance()
+                                .getReference(Constants.FIREBASE_CHILD_HOUSES)
+                                .child(mSingleHouseId);
+
+                        houseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot houseSnapshot) {
+                                if (houseSnapshot.exists()){
+                                    mHouse = houseSnapshot.getValue(House.class);
+//                                TODO frontend - populate views with house Info
+                                    Log.d("sucess house retrieve: ", mHouse.getName());
+                                } else{
+//                    TODO frontend - set text 'no houses yet'
+                                    Log.d("test house retrieval: ", "fail, no houses from listener");
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {}
+                        });
+                    } else{
+                        Log.d("test house retrieval: ", "fail, no houses for roommate");
+                    }
                 } else{
                     mRoommate = new Roommate(mUser.getDisplayName(), mUser.getUid());
-                    Log.d("MAIN: doesnt exist", mRoommate.getRoommateId());
+//                    TODO frontend - set text 'no houses yet'
+                    DatabaseReference roommatePushRef = roommateRef.child(mRoommate.getRoommateId());
+                    roommatePushRef.setValue(mRoommate);
+                    Log.d("test house retrieval: ", "profile just generated");
                 }
             }
             @Override

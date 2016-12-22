@@ -101,7 +101,7 @@ public class NewHouseActivity extends AppCompatActivity implements
 
                     mRoommate.addHouseId(house.getHouseCode());
                     house.addRoommateId(mRoommateId);
-
+//                    TODO ^house id additions (to roommate object) don't push, they replace. would be an issue for multiple houses per user (and same issue arises in UseCodeActivity where roommates join a house - the new house id replaces the one there before it)
                     housePushRef.setValue(house);
                     roommatePushRef.setValue(mRoommate);
                     Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
