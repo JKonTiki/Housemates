@@ -11,14 +11,15 @@ import java.util.List;
 
 @Parcel
 public class Roommate {
-    private String name;
-    private List<String> houseIds= new ArrayList<String>();
-    private String roommateId;
-    private boolean home;
+    public String name;
+    public List<String> houseIds= new ArrayList<String>();
+    public String roommateId;
+    public String atHome;
 
     public Roommate(String name, String roommateId){
         this.name = name;
         this.roommateId = roommateId;
+        this.atHome = "unavailable";
     }
 
     public Roommate(){}
@@ -37,6 +38,19 @@ public class Roommate {
 
     public String getRoommateId() {
         return roommateId;
+    }
+
+    public String getHomeStatus(){
+        return atHome;
+    }
+
+    public void isHome(boolean _isHome){
+        if (_isHome){
+            atHome = "true";
+
+        } else{
+            atHome = "false";
+        }
     }
 
     public void setRoommateId(String pushId) {

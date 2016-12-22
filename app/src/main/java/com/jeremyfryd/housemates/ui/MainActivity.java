@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jeremyfryd.housemates.Constants;
 import com.jeremyfryd.housemates.R;
+import com.jeremyfryd.housemates.adapters.InhabitantListAdapter;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
 
@@ -90,19 +91,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     mHouse = houseSnapshot.getValue(House.class);
                                     mHouseName.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
-                                    for (String inhabitantId: mActiveHouseInhabitantIds){
-                                        roommateRef.child(inhabitantId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    for (int i=0; i< mActiveHouseInhabitantIds.size(); i++){
+                                        final int currentIteration = i;
+                                        roommateRef.child(mActiveHouseInhabitantIds.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot inhabitantSnapshot) {
                                                 if (inhabitantSnapshot.exists()){
                                                     Roommate activeHouseInhabitant = inhabitantSnapshot.getValue(Roommate.class);
                                                     mActiveHouseInhabitants.add(activeHouseInhabitant);
-                                                    Log.d("inhabitant", activeHouseInhabitant.getName());
+                                                }
+                                                if (currentIteration == mActiveHouseInhabitantIds.size()-1){
+                                                    Log.d("name check", mActiveHouseInhabitants.get(0).getName());
+                                                    InhabitantListAdapter adapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
+                                                    ListView listView = (ListView) findViewById(R.id.roommatesList);
+                                                    listView.setAdapter(adapter);
                                                 }
                                             }
                                             @Override
                                             public void onCancelled(DatabaseError databaseError) {}
                                         });
+
                                     }
                                 } else{
                                     mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
