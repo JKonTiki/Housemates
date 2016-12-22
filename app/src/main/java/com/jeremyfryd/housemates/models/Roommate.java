@@ -13,9 +13,9 @@ public class Roommate {
     private String roommateId;
     private String userId;
 
-    public Roommate(String name, String houseId, String userId){
+    public Roommate(String name, String startingHouseId, String userId){
         this.name = name;
-        this.houseIds.add(houseId);
+        this.houseIds.add(startingHouseId);
         this.userId = userId;
     }
 

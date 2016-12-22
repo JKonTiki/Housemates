@@ -21,6 +21,9 @@ import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -60,29 +63,32 @@ public class UseCodeActivity extends AppCompatActivity implements View.OnClickLi
                                     .child(inputtedCode);
 
                             House house = snapshot.child(inputtedCode).getValue(House.class);
+                            List<String> houseInhabitants = house.getRoommates();
+                            boolean alreadyLivesHere = false;
+                            for (String inhabitant: houseInhabitants){
+                                if (inhabitant.equals(user.getUid())){
+                                    alreadyLivesHere = true;
+                                }
+                            }
+                            if (alreadyLivesHere){
+                                Toast.makeText(UseCodeActivity.this, "You are already listed as a housemate here!", Toast.LENGTH_LONG).show();
+                            } else{
+                                DatabaseReference roommateRef = FirebaseDatabase
+                                        .getInstance()
+                                        .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
+                                Roommate roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
+                                DatabaseReference roommatePushRef = roommateRef.push();
+                                String roommatePushId = roommatePushRef.getKey();
+                                roommate.setRoommateId(roommatePushId);
+                                house.addRoommateId(roommate.getRoommateId());
 
+                                roommatePushRef.setValue(roommate);
+                                houseRef.setValue(house);
 
-
-//                            TODO check if roommate in house already AND if roommate exists at all
-
-
-
-
-                            DatabaseReference roommateRef = FirebaseDatabase
-                                    .getInstance()
-                                    .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
-                            Roommate roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
-                            DatabaseReference roommatePushRef = roommateRef.push();
-                            String roommatePushId = roommatePushRef.getKey();
-                            roommate.setRoommateId(roommatePushId);
-                            house.addRoommateId(roommate.getRoommateId());
-
-                            roommatePushRef.setValue(roommate);
-                            houseRef.setValue(house);
-
-                            Intent intent = new Intent(UseCodeActivity.this, MainActivity.class);
-                            startActivity(intent);
-
+                                Intent intent = new Intent(UseCodeActivity.this, MainActivity.class);
+                                startActivity(intent);
+                            }
+//                            TODO if roommate exists at all
 
                         } else{
                             Toast.makeText(UseCodeActivity.this, "This code does not exist, please ensure you've entered it correctly", Toast.LENGTH_LONG).show();
