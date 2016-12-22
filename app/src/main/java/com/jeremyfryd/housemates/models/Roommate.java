@@ -40,7 +40,7 @@ public class Roommate {
         return roommateId;
     }
 
-    public String getHomeStatus(){
+    public String getAtHome(){
         return atHome;
     }
 

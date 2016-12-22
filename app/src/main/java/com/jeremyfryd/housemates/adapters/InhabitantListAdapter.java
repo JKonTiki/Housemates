@@ -20,9 +20,10 @@ import java.util.List;
 
 public class InhabitantListAdapter extends ArrayAdapter<Roommate> {
     LayoutInflater mInflater;
-    View mView;
+    List<Roommate> mRoommates;
     public InhabitantListAdapter(Context context, List<Roommate> roommates) {
         super(context, 0, roommates);
+        mRoommates = roommates;
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -37,19 +38,18 @@ public class InhabitantListAdapter extends ArrayAdapter<Roommate> {
         else {
             holder = (InhabitantViewHolder) convertView.getTag();
         }
-//        Roommate roommate = getItem(position);
-        Roommate roommate = new Roommate("jim", "testID");
-        roommate.isHome(false);
+
+        Roommate roommate = mRoommates.get(position);
 
         holder.mRoommateName = (TextView) convertView.findViewById(R.id.roommateName);
         holder.mRoommateName.setText(roommate.getName());
         Log.d("InhabitantAdapterLog1", roommate.getName());
-        Log.d("InhabitantAdapterLog2", roommate.getHomeStatus());
-        if (roommate.getHomeStatus().equals("unavailable")){
+        Log.d("InhabitantAdapterLog2", roommate.getAtHome());
+        if (roommate.getAtHome().equals("unavailable")){
             holder.mHomeStatus = (ImageView) convertView.findViewById(R.id.isHomeIconUnavailable);
-        } else if(roommate.getHomeStatus().equals("false")){
+        } else if(roommate.getAtHome().equals("false")){
             holder.mHomeStatus = (ImageView) convertView.findViewById(R.id.isHomeIconFalse);
-        } else if(roommate.getHomeStatus().equals("true")){
+        } else if(roommate.getAtHome().equals("true")){
             holder.mHomeStatus = (ImageView) convertView.findViewById(R.id.isHomeIconTrue);
         }
         holder.mHomeStatus.setVisibility(View.VISIBLE);

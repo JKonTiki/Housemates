@@ -101,7 +101,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     mActiveHouseInhabitants.add(activeHouseInhabitant);
                                                 }
                                                 if (currentIteration == mActiveHouseInhabitantIds.size()-1){
-                                                    Log.d("name check", mActiveHouseInhabitants.get(0).getName());
+
+
+
+//                                                    TODO geofencing listener here
+
+
+
                                                     InhabitantListAdapter adapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
                                                     ListView listView = (ListView) findViewById(R.id.roommatesList);
                                                     listView.setAdapter(adapter);
