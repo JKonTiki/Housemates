@@ -34,6 +34,8 @@ import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -57,6 +59,9 @@ public class NewHouseActivity extends AppCompatActivity implements
     private SharedPreferences.Editor mEditor;
     private boolean locationUpdated;
     private String mCode = "";
+    private Roommate mRoommate;
+    private String mRoommateId;
+
 
 
     @Override
@@ -70,6 +75,9 @@ public class NewHouseActivity extends AppCompatActivity implements
         mEditor = mSharedPreferences.edit();
         locationUpdated = false;
         generateCode();
+        mRoommate = Parcels.unwrap(getIntent().getParcelableExtra("currentRoommate"));
+        mRoommateId = mRoommate.getRoommateId();
+
     }
 
     @Override
@@ -80,40 +88,24 @@ public class NewHouseActivity extends AppCompatActivity implements
             final String houseName = mHouseName.getText().toString();
             if (mCode.length()>0){
                 if ((mLatitude != null && mLongitude != null) && houseName.length() > 0){
-                    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    final String userId = user.getUid();
-                    final DatabaseReference roommateRef = FirebaseDatabase
+                    DatabaseReference roommateRef = FirebaseDatabase
                             .getInstance()
                             .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
+                    DatabaseReference roommatePushRef = roommateRef.child(mRoommateId);
 
-                    roommateRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            final Roommate roommate;
-                            House house = new House(houseName, mLatitude, mLongitude, mCode);
-                            DatabaseReference houseRef = FirebaseDatabase
+                    DatabaseReference houseRef = FirebaseDatabase
                                     .getInstance()
                                     .getReference(Constants.FIREBASE_CHILD_HOUSES);
-                            DatabaseReference housePushRef = houseRef.child(house.getHouseCode());
-                            if (snapshot.hasChild(userId)) {
-                                roommate = snapshot.child(userId).getValue(Roommate.class);
-                                roommate.addHouseId(house.getHouseCode());
-                            } else{
-                                roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
-                            }                        DatabaseReference roommatePushRef = roommateRef.child(user.getUid());
+                    House house = new House(houseName, mLatitude, mLongitude, mCode);
+                    DatabaseReference housePushRef = houseRef.child(house.getHouseCode());
 
-                            house.addRoommateId(roommate.getRoommateId());
+                    mRoommate.addHouseId(house.getHouseCode());
+                    house.addRoommateId(mRoommateId);
 
-                            housePushRef.setValue(house);
-                            roommatePushRef.setValue(roommate);
-
-                            Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
-                            startActivity(intent);
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {}
-                    });
-
+                    housePushRef.setValue(house);
+                    roommatePushRef.setValue(mRoommate);
+                    Intent intent = new Intent(NewHouseActivity.this, MainActivity.class);
+                    startActivity(intent);
                 } else{
                     Toast.makeText(NewHouseActivity.this, "Please enter name and location", Toast.LENGTH_SHORT).show();
                 }
@@ -140,7 +132,6 @@ public class NewHouseActivity extends AppCompatActivity implements
 
 
     private void checkCodeUniqueness(final String code) {
-        boolean codeIsUnique = true;
         DatabaseReference houseRef = FirebaseDatabase
                 .getInstance()
                 .getReference(Constants.FIREBASE_CHILD_HOUSES);

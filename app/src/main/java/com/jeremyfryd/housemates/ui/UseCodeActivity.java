@@ -9,8 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,7 +20,8 @@ import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import butterknife.Bind;
@@ -30,12 +30,16 @@ import butterknife.ButterKnife;
 public class UseCodeActivity extends AppCompatActivity implements View.OnClickListener{
     @Bind(R.id.submitCode) Button mSubmitCodeButton;
     @Bind(R.id.codeInput) TextView mCodeInput;
+    private Roommate mRoommate;
+    private String mRoommateId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_use_code);
         ButterKnife.bind(this);
+        mRoommate = Parcels.unwrap(getIntent().getParcelableExtra("currentRoommate"));
+        mRoommateId = mRoommate.getRoommateId();
 
         mSubmitCodeButton.setOnClickListener(this);
     }
@@ -56,7 +60,6 @@ public class UseCodeActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onDataChange(DataSnapshot snapshot) {
                         if (snapshot.hasChild(inputtedCode)) {
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             DatabaseReference houseRef = FirebaseDatabase
                                     .getInstance()
                                     .getReference(Constants.FIREBASE_CHILD_HOUSES)
@@ -66,7 +69,7 @@ public class UseCodeActivity extends AppCompatActivity implements View.OnClickLi
                             List<String> houseInhabitants = house.getRoommates();
                             boolean alreadyLivesHere = false;
                             for (String inhabitant: houseInhabitants){
-                                if (inhabitant.equals(user.getUid())){
+                                if (inhabitant.equals(mRoommateId)){
                                     alreadyLivesHere = true;
                                 }
                             }
@@ -76,20 +79,14 @@ public class UseCodeActivity extends AppCompatActivity implements View.OnClickLi
                                 DatabaseReference roommateRef = FirebaseDatabase
                                         .getInstance()
                                         .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
-                                Roommate roommate = new Roommate(user.getDisplayName(), house.getHouseCode(), user.getUid());
-                                DatabaseReference roommatePushRef = roommateRef.push();
-                                String roommatePushId = roommatePushRef.getKey();
-                                roommate.setRoommateId(roommatePushId);
-                                house.addRoommateId(roommate.getRoommateId());
-
-                                roommatePushRef.setValue(roommate);
+                                DatabaseReference roommatePushRef = roommateRef.child(mRoommateId);
+                                mRoommate.addHouseId(house.getHouseCode());
+                                house.addRoommateId(mRoommateId);
+                                roommatePushRef.setValue(mRoommate);
                                 houseRef.setValue(house);
-
                                 Intent intent = new Intent(UseCodeActivity.this, MainActivity.class);
                                 startActivity(intent);
                             }
-//                            TODO if roommate exists at all
-
                         } else{
                             Toast.makeText(UseCodeActivity.this, "This code does not exist, please ensure you've entered it correctly", Toast.LENGTH_LONG).show();
                         }

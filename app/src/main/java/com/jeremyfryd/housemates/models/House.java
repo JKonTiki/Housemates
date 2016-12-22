@@ -11,7 +11,7 @@ public class House {
     private String name;
     private String latitude;
     private String longitude;
-    private List<String> roommates = new ArrayList<String>();
+    private List<String> roommates = new ArrayList<>();
     private String houseCode;
 
     public House(String name, String latitude, String longitude, String houseCode){

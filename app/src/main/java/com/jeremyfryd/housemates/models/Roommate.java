@@ -1,5 +1,7 @@
 package com.jeremyfryd.housemates.models;
 
+import org.parceler.Parcel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,16 +9,15 @@ import java.util.List;
  * Created by jeremy on 12/20/16.
  */
 
+@Parcel
 public class Roommate {
     private String name;
     private List<String> houseIds= new ArrayList<String>();
     private String roommateId;
-    private String userId;
 
-    public Roommate(String name, String startingHouseId, String userId){
+    public Roommate(String name, String roommateId){
         this.name = name;
-        this.houseIds.add(startingHouseId);
-        this.userId = userId;
+        this.roommateId = roommateId;
     }
 
     public Roommate(){}

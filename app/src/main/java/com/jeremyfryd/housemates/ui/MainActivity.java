@@ -25,6 +25,8 @@ import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -42,7 +44,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DatabaseReference databaseRef;
     private ChildEventListener roommatesListener;
     private ChildEventListener housesListener;
-
+    private Roommate mRoommate;
+    private FirebaseUser mUser;
+    private String mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAddNewHouseIcon.setOnClickListener(this);
         mJoinArrowIcon.setOnClickListener(this);
         mJoinHouseIcon.setOnClickListener(this);
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUserId = mUser.getUid();
+
+        final DatabaseReference roommateRef = FirebaseDatabase
+                .getInstance()
+                .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
+
+        DatabaseReference houseRef = FirebaseDatabase
+                .getInstance()
+                .getReference(Constants.FIREBASE_CHILD_HOUSES);
+
+        roommateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.hasChild(mUserId)) {
+                    mRoommate = snapshot.child(mUserId).getValue(Roommate.class);
+                    Log.d("MAIN: already exists", mRoommate.getRoommateId());
+                } else{
+                    mRoommate = new Roommate(mUser.getDisplayName(), mUser.getUid());
+                    Log.d("MAIN: doesnt exist", mRoommate.getRoommateId());
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+
+
+
 
 
         databaseRef = FirebaseDatabase
@@ -86,10 +119,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        roommatesListener = databaseRef.child(Constants.FIREBASE_CHILD_ROOMMATES).addChildEventListener(new ChildEventListener() {
+        roommatesListener = databaseRef.child(Constants.FIREBASE_CHILD_ROOMMATES).child(mUserId).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mRoommates.add(dataSnapshot.getValue(Roommate.class));
+
+
+
+
+
             }
 
             @Override
@@ -120,9 +157,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             logout();
         } else if(v == mAddNewHouseIcon || v == mAddNewPlusIcon){
             Intent intent = new Intent(MainActivity.this, NewHouseActivity.class);
+            intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
             startActivity(intent);
         } else if(v == mJoinArrowIcon || v == mJoinHouseIcon){
             Intent intent = new Intent(MainActivity.this, UseCodeActivity.class);
+            intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
             startActivity(intent);
         }
     }
