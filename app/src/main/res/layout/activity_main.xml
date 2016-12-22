@@ -57,5 +57,30 @@
         android:layout_marginEnd="6dp"
         android:layout_marginBottom="6dp" />
 
+    <TextView
+        android:text=""
+        android:textSize="25dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/joinArrow"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="155dp"
+        android:id="@+id/noHousesMessage" />
+
+    <TextView
+        android:text=""
+        android:textSize="20dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/houseName"
+        android:layout_marginBottom="60dp"
+        android:layout_alignBottom="@+id/noHousesMessage"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="26dp" />
+
 
 </RelativeLayout>

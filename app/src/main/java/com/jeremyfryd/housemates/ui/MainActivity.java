@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Bind(R.id.addNewHouse) ImageView mAddNewHouseIcon;
     @Bind(R.id.joinArrow) ImageView mJoinArrowIcon;
     @Bind(R.id.joinHouse) ImageView mJoinHouseIcon;
+    @Bind(R.id.noHousesMessage) TextView mNoHousesTextView;
+    @Bind(R.id.houseName) TextView mHouseName;
     private ChildEventListener mChildEventListener;
     private ArrayList<House> mHouses= new ArrayList<House>();
     private ArrayList<Roommate> mRoommates= new ArrayList<Roommate>();
@@ -88,95 +91,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             public void onDataChange(DataSnapshot houseSnapshot) {
                                 if (houseSnapshot.exists()){
                                     mHouse = houseSnapshot.getValue(House.class);
-//                                TODO frontend - populate views with house Info
-                                    Log.d("sucess house retrieve: ", mHouse.getName());
+                                    mHouseName.setText(mHouse.getName()+ ":");
+
+
+
+
+
+
+
                                 } else{
-//                    TODO frontend - set text 'no houses yet'
-                                    Log.d("test house retrieval: ", "fail, no houses from listener");
+                                    mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
+                                    Log.d("house retrieval: ", "fail, no houses from listener");
                                 }
                             }
                             @Override
                             public void onCancelled(DatabaseError databaseError) {}
                         });
                     } else{
-                        Log.d("test house retrieval: ", "fail, no houses for roommate");
+                        Log.d("house retrieval: ", "fail, no houses for roommate");
+                        mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
                     }
                 } else{
                     mRoommate = new Roommate(mUser.getDisplayName(), mUser.getUid());
-//                    TODO frontend - set text 'no houses yet'
+                    mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
                     DatabaseReference roommatePushRef = roommateRef.child(mRoommate.getRoommateId());
                     roommatePushRef.setValue(mRoommate);
-                    Log.d("test house retrieval: ", "profile just generated");
+                    Log.d("house retrieval: ", "profile just generated");
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
-        });
-
-
-
-
-
-
-        databaseRef = FirebaseDatabase
-                .getInstance()
-                .getReference();
-        housesListener = databaseRef.child(Constants.FIREBASE_CHILD_HOUSES).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mHouses.add(dataSnapshot.getValue(House.class));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        roommatesListener = databaseRef.child(Constants.FIREBASE_CHILD_ROOMMATES).child(mUserId).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-
-
-
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
     }
 
