@@ -29,6 +29,7 @@ import com.jeremyfryd.housemates.models.Roommate;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,17 +42,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Bind(R.id.joinHouse) ImageView mJoinHouseIcon;
     @Bind(R.id.noHousesMessage) TextView mNoHousesTextView;
     @Bind(R.id.houseName) TextView mHouseName;
-    private ChildEventListener mChildEventListener;
-    private ArrayList<House> mHouses= new ArrayList<House>();
-    private ArrayList<Roommate> mRoommates= new ArrayList<Roommate>();
-    private DatabaseReference databaseRef;
-    private ChildEventListener roommatesListener;
-    private ChildEventListener housesListener;
     private Roommate mRoommate;
     private FirebaseUser mUser;
     private String mUserId;
     private House mHouse;
-    private String mSingleHouseId;
+    private String mActiveHouseId;
+    private List<String> mActiveHouseInhabitantIds;
+    private List<Roommate> mActiveHouseInhabitants = new ArrayList<Roommate>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,26 +76,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (roommateSnapshot.exists()) {
                     mRoommate = roommateSnapshot.getValue(Roommate.class);
                     if (mRoommate.getHouseIds().size()>0){
-                        mSingleHouseId = mRoommate.getHouseIds().get(0);
+                        mActiveHouseId = mRoommate.getHouseIds().get(0);
 
                         DatabaseReference houseRef = FirebaseDatabase
                                 .getInstance()
                                 .getReference(Constants.FIREBASE_CHILD_HOUSES)
-                                .child(mSingleHouseId);
+                                .child(mActiveHouseId);
 
-                        houseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        houseRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot houseSnapshot) {
                                 if (houseSnapshot.exists()){
                                     mHouse = houseSnapshot.getValue(House.class);
                                     mHouseName.setText(mHouse.getName()+ ":");
-
-
-
-
-
-
-
+                                    mActiveHouseInhabitantIds = mHouse.getRoommates();
+                                    for (String inhabitantId: mActiveHouseInhabitantIds){
+                                        roommateRef.child(inhabitantId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot inhabitantSnapshot) {
+                                                if (inhabitantSnapshot.exists()){
+                                                    Roommate activeHouseInhabitant = inhabitantSnapshot.getValue(Roommate.class);
+                                                    mActiveHouseInhabitants.add(activeHouseInhabitant);
+                                                    Log.d("inhabitant", activeHouseInhabitant.getName());
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {}
+                                        });
+                                    }
                                 } else{
                                     mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
                                     Log.d("house retrieval: ", "fail, no houses from listener");
@@ -145,12 +150,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        databaseRef.removeEventListener(housesListener);
-        databaseRef.removeEventListener(roommatesListener);
     }
 }

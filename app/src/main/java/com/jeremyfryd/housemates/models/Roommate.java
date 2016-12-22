@@ -14,6 +14,7 @@ public class Roommate {
     private String name;
     private List<String> houseIds= new ArrayList<String>();
     private String roommateId;
+    private boolean home;
 
     public Roommate(String name, String roommateId){
         this.name = name;
