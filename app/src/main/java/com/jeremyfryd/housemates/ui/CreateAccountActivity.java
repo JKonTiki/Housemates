@@ -2,6 +2,8 @@ package com.jeremyfryd.housemates.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.jeremyfryd.housemates.Constants;
 import com.jeremyfryd.housemates.R;
 
 import butterknife.Bind;
@@ -29,16 +32,15 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ProgressDialog mAuthProgressDialog;
     private String mName;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
-    @Bind(R.id.createUserButton)
-    Button mCreateUserButton;
-    @Bind(R.id.nameEditText)
-    EditText mNameEditText;
+    @Bind(R.id.createUserButton) Button mCreateUserButton;
+    @Bind(R.id.nameEditText) EditText mNameEditText;
     @Bind(R.id.emailEditText) EditText mEmailEditText;
     @Bind(R.id.passwordEditText) EditText mPasswordEditText;
     @Bind(R.id.confirmPasswordEditText) EditText mConfirmPasswordEditText;
-    @Bind(R.id.loginTextView)
-    TextView mLoginTextView;
+    @Bind(R.id.loginTextView) TextView mLoginTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,8 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_create_account);
 
         ButterKnife.bind(this);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mSharedPreferences.edit();
 
         mAuth = FirebaseAuth.getInstance();
         createAuthStateListener();
@@ -89,6 +93,8 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
 
     public void createNewUser() {
         mName = mNameEditText.getText().toString().trim();
+        Log.d("Name step 1", mName);
+        mEditor.putString(Constants.PREFERENCES_USERNAME_KEY, mName).apply();
         final String name = mNameEditText.getText().toString().trim();
         final String email = mEmailEditText.getText().toString().trim();
         String password = mPasswordEditText.getText().toString().trim();
@@ -113,7 +119,7 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
 
                 if (task.isSuccessful()) {
                     Log.d(TAG, "Authentication successful");
-                    createFirebaseUserProfile(task.getResult().getUser());
+//                    createFirebaseUserProfile(task.getResult().getUser());
                 } else {
                     Toast.makeText(CreateAccountActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
@@ -124,24 +130,20 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         });
     }
 
-    private void createFirebaseUserProfile(final FirebaseUser user) {
-
-        UserProfileChangeRequest addProfileName = new UserProfileChangeRequest.Builder()
-                .setDisplayName(mName)
-                .build();
-
-        user.updateProfile(addProfileName)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, user.getDisplayName());
-                        }
-                    }
-
-                });
-    }
+//    private void createFirebaseUserProfile(final FirebaseUser user) {
+//        UserProfileChangeRequest addProfileName = new UserProfileChangeRequest.Builder()
+//                .setDisplayName(mName)
+//                .build();
+//        user.updateProfile(addProfileName)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            Log.d(TAG, user.getDisplayName());
+//                        }
+//                    }
+//                });
+//    }
 
     private void createAuthProgressDialog() {
         mAuthProgressDialog = new ProgressDialog(this);
