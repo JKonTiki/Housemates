@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Bind(R.id.noHousesMessage) TextView mNoHousesTextView;
     @Bind(R.id.houseName) TextView mHouseName;
     @Bind(R.id.roommatesList) ListView mActiveRoommatesListView;
+    @Bind(R.id.toGetCode) Button mToGetCodeButton;
     private SharedPreferences mSharedPreferences;
     private Roommate mRoommate;
     private FirebaseUser mUser;
@@ -56,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private InhabitantListAdapter mAdapter;
     private List<String> mActiveHouseInhabitantIds;
     private List<Roommate> mActiveHouseInhabitants = new ArrayList<Roommate>();
-    private String mFinalIteratedInhabitantId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAddNewHouseIcon.setOnClickListener(this);
         mJoinArrowIcon.setOnClickListener(this);
         mJoinHouseIcon.setOnClickListener(this);
+        mToGetCodeButton.setOnClickListener(this);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mUserId = mUser.getUid();
         mUsername = mSharedPreferences.getString(Constants.PREFERENCES_USERNAME_KEY, null);
@@ -102,12 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     mHouse = houseSnapshot.getValue(House.class);
                                     mHouseName.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
-                                    int houseSize = mActiveHouseInhabitantIds.size();
-                                    if (mActiveHouseInhabitantIds.size() > 0){
-                                        mFinalIteratedInhabitantId = mActiveHouseInhabitantIds.get(1);
-                                        Log.d("final iterant id", mFinalIteratedInhabitantId);
-                                    }
-
                                     for (int i=0; i< mActiveHouseInhabitantIds.size(); i++){
                                         Log.d("iterating ID", mActiveHouseInhabitantIds.get(i));
                                         roommateRef.child(mActiveHouseInhabitantIds.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -117,20 +113,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     Roommate activeHouseInhabitant = inhabitantSnapshot.getValue(Roommate.class);
                                                     Log.d("iterating roommate", activeHouseInhabitant.getName());
                                                     mActiveHouseInhabitants.add(activeHouseInhabitant);
-                                                    activeHouseInhabitant.isHome(true);
 
-                                                    if (mFinalIteratedInhabitantId.equals(activeHouseInhabitant.getRoommateId())){
 
 //                                                    TODO set each roommates geofence status here
+                                                    activeHouseInhabitant.isHome(true);
 
-                                                        if (mAdapter == null){
-                                                            Log.d("current iteration", "new adapter");
-                                                            mAdapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
-                                                            mActiveRoommatesListView.setAdapter(mAdapter);
-                                                        } else{
-                                                            Log.d("current iteration", "reuse adapter");
-                                                            mAdapter.notifyDataSetChanged();
-                                                        }
+
+                                                    if (mAdapter == null){
+                                                        Log.d("current iteration", "new adapter");
+                                                        mAdapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
+                                                        mActiveRoommatesListView.setAdapter(mAdapter);
+                                                    } else{
+                                                        Log.d("current iteration", "reuse adapter");
+                                                        mAdapter.notifyDataSetChanged();
                                                     }
                                                 }
 
@@ -184,6 +179,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if(v == mJoinArrowIcon || v == mJoinHouseIcon){
             Intent intent = new Intent(MainActivity.this, UseCodeActivity.class);
             intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
+            startActivity(intent);
+        } else if (v == mToGetCodeButton){
+            Intent intent = new Intent(MainActivity.this, GetCodeActivity.class);
+            intent.putExtra("currentHouse", Parcels.wrap(mHouse));
             startActivity(intent);
         }
     }
