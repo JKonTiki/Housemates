@@ -124,9 +124,7 @@ public class NewHouseActivity extends AppCompatActivity implements
             }
             String randomCharacterString = Character.toString((char) randomNum);
             code += randomCharacterString;
-            Log.d("ASCII number", String.valueOf(randomNum));
         }
-        Log.d("code", code);
         checkCodeUniqueness(code);
     }
 

@@ -10,6 +10,7 @@ public class Constants {
     public static final String FIREBASE_CHILD_ROOMMATES = "roommates";
     public static final String PREFERENCES_LATITUDE_KEY = "latitude";
     public static final String PREFERENCES_LONGITUDE_KEY = "longitude";
+    public static final String PREFERENCES_USERNAME_KEY = "username";
 
 
 }
