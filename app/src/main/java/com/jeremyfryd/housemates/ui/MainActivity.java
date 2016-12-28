@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Bind(R.id.joinHouse) ImageView mJoinHouseIcon;
     @Bind(R.id.noHousesMessage) TextView mNoHousesTextView;
     @Bind(R.id.houseName) TextView mHouseName;
+    @Bind(R.id.roommatesList) ListView mActiveRoommatesListView;
     private SharedPreferences mSharedPreferences;
     private Roommate mRoommate;
     private FirebaseUser mUser;
@@ -52,8 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String mUserId;
     private House mHouse;
     private String mActiveHouseId;
+    private InhabitantListAdapter mAdapter;
     private List<String> mActiveHouseInhabitantIds;
     private List<Roommate> mActiveHouseInhabitants = new ArrayList<Roommate>();
+    private String mFinalIteratedInhabitantId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mRoommate = roommateSnapshot.getValue(Roommate.class);
                     if (mRoommate.getHouseIds().size()>0){
                         mActiveHouseId = mRoommate.getHouseIds().get(0);
-                        Log.d("this roommate", mRoommate.getAtHome());
+                        Log.d("active user profile", mRoommate.getName());
                         DatabaseReference houseRef = FirebaseDatabase
                                 .getInstance()
                                 .getReference(Constants.FIREBASE_CHILD_HOUSES)
@@ -99,35 +102,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     mHouse = houseSnapshot.getValue(House.class);
                                     mHouseName.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
+                                    int houseSize = mActiveHouseInhabitantIds.size();
+                                    if (mActiveHouseInhabitantIds.size() > 0){
+                                        mFinalIteratedInhabitantId = mActiveHouseInhabitantIds.get(1);
+                                        Log.d("final iterant id", mFinalIteratedInhabitantId);
+                                    }
+
                                     for (int i=0; i< mActiveHouseInhabitantIds.size(); i++){
-                                        final int currentIteration = i;
+                                        Log.d("iterating ID", mActiveHouseInhabitantIds.get(i));
                                         roommateRef.child(mActiveHouseInhabitantIds.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot inhabitantSnapshot) {
                                                 if (inhabitantSnapshot.exists()){
                                                     Roommate activeHouseInhabitant = inhabitantSnapshot.getValue(Roommate.class);
-                                                    Log.d("activeinhabitant", activeHouseInhabitant.getAtHome());
+                                                    Log.d("iterating roommate", activeHouseInhabitant.getName());
                                                     mActiveHouseInhabitants.add(activeHouseInhabitant);
+                                                    activeHouseInhabitant.isHome(true);
+
+                                                    if (mFinalIteratedInhabitantId.equals(activeHouseInhabitant.getRoommateId())){
+
+//                                                    TODO set each roommates geofence status here
+
+                                                        if (mAdapter == null){
+                                                            Log.d("current iteration", "new adapter");
+                                                            mAdapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
+                                                            mActiveRoommatesListView.setAdapter(mAdapter);
+                                                        } else{
+                                                            Log.d("current iteration", "reuse adapter");
+                                                            mAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }
                                                 }
-                                                if (currentIteration == mActiveHouseInhabitantIds.size()-1){
 
-
-
-//                                                    TODO geofencing listener here
-
-
-
-                                                    InhabitantListAdapter adapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
-                                                    Log.d("mainactivity", String.valueOf(currentIteration));
-                                                    ListView listView = (ListView) findViewById(R.id.roommatesList);
-                                                    listView.setAdapter(adapter);
-                                                }
                                             }
                                             @Override
                                             public void onCancelled(DatabaseError databaseError) {}
                                         });
 
                                     }
+
+
+
+
+
                                 } else{
                                     mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
                                     Log.d("house retrieval: ", "fail, no houses from listener");
