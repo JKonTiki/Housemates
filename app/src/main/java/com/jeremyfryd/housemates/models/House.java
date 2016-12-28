@@ -1,5 +1,7 @@
 package com.jeremyfryd.housemates.models;
 
+import org.parceler.Parcel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import java.util.List;
  * Created by jeremy on 12/20/16.
  */
 
+@Parcel
 public class House {
     private String name;
     private String latitude;

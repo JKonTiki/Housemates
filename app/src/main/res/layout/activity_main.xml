@@ -90,5 +90,18 @@
         android:id="@+id/roommatesList"
         android:layout_marginStart="13dp" />
 
+    <Button
+        android:text="Invite a friend"
+        android:layout_width="wrap_content"
+        android:padding="10dp"
+        android:background="@android:color/white"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/joinArrow"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="39dp"
+        android:id="@+id/toGetCode" />
+
 
 </RelativeLayout>
