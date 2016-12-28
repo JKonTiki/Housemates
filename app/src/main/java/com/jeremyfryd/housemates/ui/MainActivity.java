@@ -102,6 +102,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             public void onDataChange(DataSnapshot houseSnapshot) {
                                 if (houseSnapshot.exists()){
                                     mHouse = houseSnapshot.getValue(House.class);
+
+
+//                                    establish Geofence
+
+
+
+
+
+
+
+
+
                                     mHouseName.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
                                     for (int i=0; i< mActiveHouseInhabitantIds.size(); i++){

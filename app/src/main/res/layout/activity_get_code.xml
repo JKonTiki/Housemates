@@ -39,5 +39,17 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:text="Text this to someone"
+        android:layout_width="wrap_content"
+        android:padding="10dp"
+        android:background="@android:color/white"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_height="wrap_content"
+        android:id="@+id/sendCodeTextMessage"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="89dp" />
+
 
 </RelativeLayout>

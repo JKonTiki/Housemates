@@ -35,7 +35,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jeremyfryd.housemates.ui.MainActivity" />
         </activity>
-        <activity android:name=".ui.GetCodeActivity">
+        <activity android:name=".ui.GetCodeActivity"
+            android:theme="@style/Default">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jeremyfryd.housemates.ui.MainActivity" />
