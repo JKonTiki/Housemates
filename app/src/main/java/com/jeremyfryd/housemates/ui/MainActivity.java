@@ -73,9 +73,6 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        OnMapReadyCallback,
-        GoogleMap.OnMapClickListener,
-        GoogleMap.OnMarkerClickListener,
         LocationListener,
         ResultCallback<Status> {
     @Bind(R.id.userLogo) ImageView mUserLogo;
@@ -102,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient googleApiClient;
     private GoogleMap map;
     private MapFragment mapFragment;
-    private Location lastLocation;
+    private Location mLastLocation;
     private LocationRequest locationRequest;
     private final int REQ_PERMISSION = 999;
     private Marker locationMarker;
@@ -110,8 +107,9 @@ public class MainActivity extends AppCompatActivity implements
     private PendingIntent geoFencePendingIntent;
     private final int GEOFENCE_REQ_CODE = 0;
     private Circle geoFenceLimits;
-    private boolean initMapsReadyForHouse;
-    private boolean initMapsReadyForApiClient;
+    private boolean geofenceReadyForHouse;
+    private boolean geofenceReadyForApiClient;
+    private LatLng mHouseLatLng;
 
 
     @Override
@@ -158,12 +156,12 @@ public class MainActivity extends AppCompatActivity implements
                                 if (houseSnapshot.exists()){
                                     mHouse = houseSnapshot.getValue(House.class);
 
+                                    geofenceReadyForHouse = true;
                                     Log.d("house", mHouse.getName());
-                                    initMapsReadyForHouse = true;
-                                    initGMaps();
-                                    initMapsReadyForHouse = false;
-
-
+                                    mHouseLatLng = new LatLng(Double.parseDouble(mHouse.getLatitude()), Double.parseDouble(mHouse.getLongitude()));
+                                    if (geofenceReadyForHouse && geofenceReadyForApiClient){
+                                        startGeofence(mHouseLatLng);
+                                    }
 
                                     mHouseName.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
@@ -269,35 +267,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void initGMaps() {
-        Log.d(TAG, "initGMaps()");
-        if (initMapsReadyForApiClient && initMapsReadyForHouse){
-            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-            getLastKnownLocation();
-        }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady()");
-        map = googleMap;
-        map.setOnMapClickListener(this);
-        map.setOnMarkerClickListener(this);
-    }
-
-    @Override
-    public void onMapClick(LatLng latLng) {
-        Log.d(TAG, "onMapClick("+latLng +")");
-        markerForGeofence(latLng);
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        Log.d(TAG, "onMarkerClickListener: " + marker.getPosition() );
-        return false;
-    }
-
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart()");
@@ -315,9 +284,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "onConnected()");
-        initMapsReadyForApiClient = true;
-        initGMaps();
-        initMapsReadyForApiClient = false;
+        geofenceReadyForApiClient = true;
+        startSendingLocation();
+        if (geofenceReadyForHouse && geofenceReadyForApiClient){
+            startGeofence(mHouseLatLng);
+        }
     }
 
     @Override
@@ -330,14 +301,21 @@ public class MainActivity extends AppCompatActivity implements
         Log.w(TAG, "onConnectionFailed()");
     }
 
+
+
+
+
+
+    private void startSendingLocation() {
+        Log.d(TAG, "startSendingLocation()");
+        getLastKnownLocation();
+    }
+
     private void getLastKnownLocation() {
         Log.d(TAG, "getLastKnownLocation()");
         if ( checkPermission() ) {
-            lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if ( lastLocation != null ) {
-                Log.i(TAG, "LasKnown location. " +
-                        "Long: " + lastLocation.getLongitude() +
-                        " | Lat: " + lastLocation.getLatitude());
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if ( mLastLocation != null ) {
                 writeLastLocation();
                 startLocationUpdates();
             } else {
@@ -348,32 +326,13 @@ public class MainActivity extends AppCompatActivity implements
         else askPermission();
     }
 
-    private boolean checkPermission() {
-        Log.d(TAG, "checkPermission()");
-        return (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED);
-    }
 
     private void writeLastLocation() {
-        writeActualLocation(lastLocation);
+        Log.d(TAG, "LastKnown location. " +
+                "Lat: " + mLastLocation.getLatitude() +
+                " | Long: " + mLastLocation.getLongitude());
     }
-
-    private void writeActualLocation(Location location) {
-//        TESTING
-//        mHouse = new House("testHouse","37.0","-125.0","TESTY");
-        markerLocation(new LatLng(Double.parseDouble(mHouse.getLatitude()), Double.parseDouble(mHouse.getLongitude())));
-    }
-
-    private void askPermission() {
-        Log.d(TAG, "askPermission()");
-        ActivityCompat.requestPermissions(
-                this,
-                new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION },
-                REQ_PERMISSION
-        );
-    }
-
-
+    
     private void startLocationUpdates(){
         Log.i(TAG, "startLocationUpdates()");
         locationRequest = LocationRequest.create()
@@ -388,8 +347,24 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged ["+location+"]");
-        lastLocation = location;
-        writeActualLocation(location);
+        mLastLocation = location;
+        writeLastLocation();
+    }
+
+
+    private boolean checkPermission() {
+        Log.d(TAG, "checkPermission()");
+        return (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void askPermission() {
+        Log.d(TAG, "askPermission()");
+        ActivityCompat.requestPermissions(
+                this,
+                new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION },
+                REQ_PERMISSION
+        );
     }
 
     @Override
@@ -416,43 +391,30 @@ public class MainActivity extends AppCompatActivity implements
         Log.w(TAG, "permissionsDenied()");
     }
 
-    private void markerLocation(LatLng latLng) {
-        Log.i(TAG, "markerLocation("+latLng+")");
-        String title = latLng.latitude + ", " + latLng.longitude;
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(latLng)
-                .title(title);
-        if ( map!=null ) {
-            // Remove the anterior marker
-            if ( locationMarker != null ){
-                locationMarker.remove();
-            }
-            locationMarker = map.addMarker(markerOptions);
-            float zoom = 22;
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
-            map.animateCamera(cameraUpdate);
+
+    @Override
+    public void onResult(@NonNull Status status) {
+        Log.i(TAG, "onResult: " + status);
+        if ( status.isSuccess() ) {
+        } else {
+            // inform about fail
         }
     }
 
-    private void markerForGeofence(LatLng latLng) {
-        Log.i(TAG, "markerForGeofence("+latLng+")");
-        String title = latLng.latitude + ", " + latLng.longitude;
-        // Define marker options
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                .title(title);
-        if ( map!=null ) {
-            // Remove last geoFenceMarker
-            if (geoFenceMarker != null)
-                geoFenceMarker.remove();
 
-            geoFenceMarker = map.addMarker(markerOptions);
-        }
+
+
+
+
+    private void startGeofence(LatLng geofenceLatLng) {
+        Log.i(TAG, "startGeofence()");
+        Geofence geofence = createGeofence( geofenceLatLng, Constants.GEOFENCE_RADIUS );
+        GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
+        addGeofence( geofenceRequest );
     }
 
     private Geofence createGeofence( LatLng latLng, float radius ) {
-        Log.d(TAG, "createGeofence");
+        Log.d(TAG, "createGeofence, Lat: " + latLng.latitude + ", Long: " + latLng.longitude);
         return new Geofence.Builder()
                 .setRequestId(Constants.GEOFENCE_REQ_ID)
                 .setCircularRegion( latLng.latitude, latLng.longitude, radius)
@@ -460,8 +422,8 @@ public class MainActivity extends AppCompatActivity implements
                 .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
                         | Geofence.GEOFENCE_TRANSITION_EXIT )
                 .build();
-    }
 
+    }
 
     private GeofencingRequest createGeofenceRequest( Geofence geofence ) {
         Log.d(TAG, "createGeofenceRequest");
@@ -471,17 +433,6 @@ public class MainActivity extends AppCompatActivity implements
 //                add mGeofences list
                 .build();
     }
-
-    private PendingIntent createGeofencePendingIntent() {
-        Log.d(TAG, "createGeofencePendingIntent");
-        if ( geoFencePendingIntent != null )
-            return geoFencePendingIntent;
-
-        Intent intent = new Intent( this, GeofenceTransitionService.class);
-        return PendingIntent.getService(
-                this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-    }
-
 
     private void addGeofence(GeofencingRequest request) {
         Log.d(TAG, "addGeofence");
@@ -493,39 +444,14 @@ public class MainActivity extends AppCompatActivity implements
             ).setResultCallback(this);
     }
 
-    @Override
-    public void onResult(@NonNull Status status) {
-        Log.i(TAG, "onResult: " + status);
-        if ( status.isSuccess() ) {
-            drawGeofence();
-        } else {
-            // inform about fail
-        }
-    }
+    private PendingIntent createGeofencePendingIntent() {
+        Log.d(TAG, "createGeofencePendingIntent");
+        if ( geoFencePendingIntent != null )
+            return geoFencePendingIntent;
 
-    private void drawGeofence() {
-        Log.d(TAG, "drawGeofence()");
-
-        if ( geoFenceLimits != null )
-            geoFenceLimits.remove();
-
-        CircleOptions circleOptions = new CircleOptions()
-                .center( geoFenceMarker.getPosition())
-                .strokeColor(Color.argb(50, 70,70,70))
-                .fillColor( Color.argb(100, 150,150,150) )
-                .radius( Constants.GEOFENCE_RADIUS );
-        geoFenceLimits = map.addCircle( circleOptions );
-    }
-
-    private void startGeofence() {
-        Log.i(TAG, "startGeofence()");
-        if( geoFenceMarker != null ) {
-            Geofence geofence = createGeofence( geoFenceMarker.getPosition(), Constants.GEOFENCE_RADIUS );
-            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
-            addGeofence( geofenceRequest );
-        } else {
-            Log.e(TAG, "Geofence marker is null");
-        }
+        Intent intent = new Intent( this, GeofenceTransitionService.class);
+        return PendingIntent.getService(
+                this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
     }
 
 }
