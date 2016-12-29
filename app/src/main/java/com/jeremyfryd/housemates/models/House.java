@@ -11,11 +11,11 @@ import java.util.List;
 
 @Parcel
 public class House {
-    private String name;
-    private String latitude;
-    private String longitude;
-    private List<String> roommates = new ArrayList<>();
-    private String houseCode;
+    public String name;
+    public String latitude;
+    public String longitude;
+    public List<String> roommates = new ArrayList<>();
+    public String houseCode;
 
     public House(String name, String latitude, String longitude, String houseCode){
         this.name = name;

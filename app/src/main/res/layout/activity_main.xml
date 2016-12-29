@@ -10,98 +10,116 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/colorAccent"
     tools:context="com.jeremyfryd.housemates.ui.MainActivity">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/user"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:id="@+id/userLogo"/>
 
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/user"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/userLogo"/>
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/house_icon"
+                android:id="@+id/addNewHouse"
+                android:layout_above="@+id/joinHouse"
+                android:layout_toEndOf="@+id/joinArrow"
+                android:layout_marginBottom="13dp" />
 
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/house_icon"
-        android:id="@+id/addNewHouse"
-        android:layout_above="@+id/joinHouse"
-        android:layout_toEndOf="@+id/joinArrow"
-        android:layout_marginBottom="13dp" />
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/house_icon"
+                android:id="@+id/joinHouse"
+                android:layout_below="@+id/userLogo"
+                android:layout_alignParentEnd="true" />
 
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/house_icon"
-        android:id="@+id/joinHouse"
-        android:layout_below="@+id/userLogo"
-        android:layout_alignParentEnd="true" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/arrow"
+                android:id="@+id/joinArrow"
+                android:layout_alignBottom="@+id/joinHouse"
+                android:layout_alignStart="@+id/addNewPlus"
+                android:layout_marginBottom="8dp" />
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/arrow"
-        android:id="@+id/joinArrow"
-        android:layout_alignBottom="@+id/joinHouse"
-        android:layout_alignStart="@+id/addNewPlus"
-        android:layout_marginBottom="8dp" />
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/add_new"
+                android:id="@+id/addNewPlus"
+                android:layout_marginRight="6dp"
+                android:layout_alignBottom="@+id/addNewHouse"
+                android:layout_toStartOf="@+id/joinHouse"
+                android:layout_marginEnd="6dp"
+                android:layout_marginBottom="6dp" />
 
-    <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@drawable/add_new"
-        android:id="@+id/addNewPlus"
-        android:layout_marginRight="6dp"
-        android:layout_alignBottom="@+id/addNewHouse"
-        android:layout_toStartOf="@+id/joinHouse"
-        android:layout_marginEnd="6dp"
-        android:layout_marginBottom="6dp" />
+            <TextView
+                android:text=""
+                android:textSize="25dp"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/joinArrow"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="155dp"
+                android:id="@+id/noHousesMessage" />
 
-    <TextView
-        android:text=""
-        android:textSize="25dp"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/joinArrow"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="155dp"
-        android:id="@+id/noHousesMessage" />
+            <TextView
+                android:text=""
+                android:textSize="20dp"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/houseName"
+                android:layout_marginBottom="60dp"
+                android:layout_alignBottom="@+id/noHousesMessage"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="26dp" />
 
-    <TextView
-        android:text=""
-        android:textSize="20dp"
-        android:textAlignment="center"
-        android:textColor="@color/colorPrimaryDark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/houseName"
-        android:layout_marginBottom="60dp"
-        android:layout_alignBottom="@+id/noHousesMessage"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="26dp" />
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/noHousesMessage"
+                android:layout_alignParentStart="true"
+                android:id="@+id/roommatesList"
+                android:layout_marginStart="13dp" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/noHousesMessage"
-        android:layout_alignParentStart="true"
-        android:id="@+id/roommatesList"
-        android:layout_marginStart="13dp" />
+            <Button
+                android:text="Invite a friend"
+                android:layout_width="wrap_content"
+                android:padding="10dp"
+                android:background="@android:color/white"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/joinArrow"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="39dp"
+                android:id="@+id/toGetCode" />
 
-    <Button
-        android:text="Invite a friend"
-        android:layout_width="wrap_content"
-        android:padding="10dp"
-        android:background="@android:color/white"
-        android:textColor="@color/colorPrimaryDark"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/joinArrow"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="39dp"
-        android:id="@+id/toGetCode" />
+            <fragment
+                class="com.google.android.gms.maps.MapFragment"
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="88dp"
+                android:layout_below="@+id/roommatesList"
+                android:layout_alignParentStart="true" />
+
+        </RelativeLayout>
+    </ScrollView>
 
 
 </RelativeLayout>
