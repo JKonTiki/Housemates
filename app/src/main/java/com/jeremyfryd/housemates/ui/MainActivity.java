@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -63,15 +65,9 @@ public class MainActivity extends AppCompatActivity implements
         LocationListener,
         ResultCallback<Status>,
         NavigationView.OnNavigationItemSelectedListener{
-    @Bind(R.id.userLogo) ImageView mUserLogo;
-    @Bind(R.id.addNewPlus) ImageView mAddNewPlusIcon;
-    @Bind(R.id.addNewHouse) ImageView mAddNewHouseIcon;
-    @Bind(R.id.joinArrow) ImageView mJoinArrowIcon;
-    @Bind(R.id.joinHouse) ImageView mJoinHouseIcon;
     @Bind(R.id.noHousesMessage) TextView mNoHousesTextView;
     @Bind(R.id.houseName) TextView mHouseNameTextView;
     @Bind(R.id.roommatesList) ListView mActiveRoommatesListView;
-    @Bind(R.id.toGetCode) Button mToGetCodeButton;
     private SharedPreferences mSharedPreferences;
     private Roommate mRoommate;
     private FirebaseUser mUser;
@@ -106,12 +102,6 @@ public class MainActivity extends AppCompatActivity implements
         createNavDrawer();
         ButterKnife.bind(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mUserLogo.setOnClickListener(this);
-        mAddNewPlusIcon.setOnClickListener(this);
-        mAddNewHouseIcon.setOnClickListener(this);
-        mJoinArrowIcon.setOnClickListener(this);
-        mJoinHouseIcon.setOnClickListener(this);
-        mToGetCodeButton.setOnClickListener(this);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mUserId = mUser.getUid();
         mUsername = mSharedPreferences.getString(Constants.PREFERENCES_USERNAME_KEY, null);
@@ -215,23 +205,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onClick(View v){
-        if (v == mUserLogo){
-//            logout();
-            Intent intent = new Intent(MainActivity.this, NavActivity.class);
-            startActivity(intent);
-        } else if(v == mAddNewHouseIcon || v == mAddNewPlusIcon){
-            Intent intent = new Intent(MainActivity.this, NewHouseActivity.class);
-            intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
-            startActivity(intent);
-        } else if(v == mJoinArrowIcon || v == mJoinHouseIcon){
-            Intent intent = new Intent(MainActivity.this, UseCodeActivity.class);
-            intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
-            startActivity(intent);
-        } else if (v == mToGetCodeButton){
-            Intent intent = new Intent(MainActivity.this, GetCodeActivity.class);
-            intent.putExtra("currentHouse", Parcels.wrap(mHouse));
-            startActivity(intent);
-        }
     }
 
     private void logout() {
@@ -476,18 +449,24 @@ public class MainActivity extends AppCompatActivity implements
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.homeIcon) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.addHouseIcon) {
+            Intent intent = new Intent(MainActivity.this, NewHouseActivity.class);
+            intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
+            startActivity(intent);
+        } else if (id == R.id.joinHouseIcon) {
+            Intent intent = new Intent(MainActivity.this, UseCodeActivity.class);
+            intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
+            startActivity(intent);
+        } else if (id == R.id.inviteIcon) {
+            Intent intent = new Intent(MainActivity.this, GetCodeActivity.class);
+            intent.putExtra("currentHouse", Parcels.wrap(mHouse));
+            startActivity(intent);
+        } else if (id == R.id.settingsIcon) {
+            Toast.makeText(MainActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.logoutIcon) {
+            logout();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
