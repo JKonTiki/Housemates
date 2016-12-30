@@ -8,11 +8,17 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -55,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
-        ResultCallback<Status> {
+        ResultCallback<Status>,
+        NavigationView.OnNavigationItemSelectedListener{
     @Bind(R.id.userLogo) ImageView mUserLogo;
     @Bind(R.id.addNewPlus) ImageView mAddNewPlusIcon;
     @Bind(R.id.addNewHouse) ImageView mAddNewHouseIcon;
@@ -95,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_nav);
+        createNavDrawer();
         ButterKnife.bind(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUserLogo.setOnClickListener(this);
@@ -130,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements
                                 .getInstance()
                                 .getReference(Constants.FIREBASE_CHILD_HOUSES)
                                 .child(mActiveHouseId);
-//lets also add a child event listener here to retrigger all of this
+        // TODO also add a child event listener for the house that would add a corresponding new individual roommate event listener
                         houseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot houseSnapshot) {
@@ -174,11 +182,6 @@ public class MainActivity extends AppCompatActivity implements
                                         });
 
                                     }
-
-
-
-
-
                                 } else{
                                     mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
                                     Log.d("house retrieval: ", "fail, no houses from listener");
@@ -213,7 +216,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v){
         if (v == mUserLogo){
-            logout();
+//            logout();
+            Intent intent = new Intent(MainActivity.this, NavActivity.class);
+            startActivity(intent);
         } else if(v == mAddNewHouseIcon || v == mAddNewPlusIcon){
             Intent intent = new Intent(MainActivity.this, NewHouseActivity.class);
             intent.putExtra("currentRoommate", Parcels.wrap(mRoommate));
@@ -281,9 +286,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
-
+//TODO refactor this as a service running at all times
     private void startSendingLocation() {
         Log.d(TAG, "startSendingLocation()");
         getLastKnownLocation();
@@ -421,5 +424,74 @@ public class MainActivity extends AppCompatActivity implements
             mActiveHouseInhabitants.set(position, activeInhabitant);
         }
         return position;
+    }
+
+
+
+
+
+    protected void createNavDrawer() {
+        Log.d(TAG, "createNavDrawer()");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

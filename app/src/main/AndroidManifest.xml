@@ -11,17 +11,18 @@
         android:icon="@drawable/house"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/NoActionBarTheme">
-
+        android:theme="@style/Default">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBW9BO16ICmTdvqMYeD29jIVPkcCcZZcGM"/>
-        <!--TODO hide this^ in production-->
+            android:value="AIzaSyBW9BO16ICmTdvqMYeD29jIVPkcCcZZcGM" />
+        <!-- TODO hide this^ in production -->
 
-
-        <activity android:name=".ui.MainActivity" />
-        <activity android:name=".ui.CreateAccountActivity" />
-        <activity android:name=".ui.LoginActivity">
+        <activity android:name=".ui.MainActivity"
+            android:theme="@style/NoActionBarTheme"/>
+        <activity android:name=".ui.CreateAccountActivity"
+            android:theme="@style/NoActionBarTheme"/>
+        <activity android:name=".ui.LoginActivity"
+            android:theme="@style/NoActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,25 +30,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.NewHouseActivity"
-            android:theme="@style/Default">
+            android:name=".ui.NewHouseActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jeremyfryd.housemates.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.UseCodeActivity"
-            android:theme="@style/Default">
+            android:name=".ui.UseCodeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jeremyfryd.housemates.ui.MainActivity" />
         </activity>
-        <activity android:name=".ui.GetCodeActivity"
-            android:theme="@style/Default">
+        <activity
+            android:name=".ui.GetCodeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jeremyfryd.housemates.ui.MainActivity" />
         </activity>
+        <activity
+            android:name=".ui.NavActivity"
+            android:label="@string/title_activity_nav"
+            android:theme="@style/NoActionBarTheme"/>
     </application>
 
 </manifest>
