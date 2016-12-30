@@ -43,6 +43,9 @@ public class InhabitantListAdapter extends ArrayAdapter<Roommate> {
 
         holder.mRoommateName = (TextView) convertView.findViewById(R.id.roommateName);
         holder.mRoommateName.setText(roommate.getName());
+        if (holder.mHomeStatus!=null){
+            holder.mHomeStatus.setVisibility(View.GONE);
+        }
         if (roommate.getAtHome().equals("unavailable")){
             holder.mHomeStatus = (ImageView) convertView.findViewById(R.id.isHomeIconUnavailable);
         } else if(roommate.getAtHome().equals("false")){

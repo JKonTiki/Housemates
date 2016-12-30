@@ -18,20 +18,4 @@ public class InhabitantViewHolder {
     public TextView mRoommateName;
     public ImageView mHomeStatus;
 
-
-//    public void bindRoommate(Roommate roommate) {
-//        TextView roommateName = (TextView) mView.findViewById(R.id.roommateName);
-//        roommateName.setText(roommate.getName());
-//        if (roommate.isHome().equals("unavailable")){
-//            mHomeStatus = (ImageView) mView.findViewById(R.id.isHomeIconUnavailable);
-//        } else if(roommate.isHome().equals("false")){
-//            mHomeStatus = (ImageView) mView.findViewById(R.id.isHomeIconFalse);
-//        } else if(roommate.isHome().equals("true")){
-//            mHomeStatus = (ImageView) mView.findViewById(R.id.isHomeIconTrue);
-//        }
-//    }
-//
-
-
-
 }

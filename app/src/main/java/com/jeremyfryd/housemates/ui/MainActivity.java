@@ -4,62 +4,43 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jeremyfryd.housemates.Constants;
-import com.jeremyfryd.housemates.Manifest;
 import com.jeremyfryd.housemates.R;
 import com.jeremyfryd.housemates.adapters.InhabitantListAdapter;
 import com.jeremyfryd.housemates.models.House;
 import com.jeremyfryd.housemates.models.Roommate;
-import com.jeremyfryd.housemates.services.GeofenceTransitionService;
-
 
 import org.parceler.Parcels;
 
@@ -81,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
     @Bind(R.id.joinArrow) ImageView mJoinArrowIcon;
     @Bind(R.id.joinHouse) ImageView mJoinHouseIcon;
     @Bind(R.id.noHousesMessage) TextView mNoHousesTextView;
-    @Bind(R.id.houseName) TextView mHouseName;
+    @Bind(R.id.houseName) TextView mHouseNameTextView;
     @Bind(R.id.roommatesList) ListView mActiveRoommatesListView;
     @Bind(R.id.toGetCode) Button mToGetCodeButton;
     private SharedPreferences mSharedPreferences;
@@ -97,19 +78,18 @@ public class MainActivity extends AppCompatActivity implements
     private List<Geofence> mGeofenceList = new ArrayList<Geofence>();
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient googleApiClient;
-    private GoogleMap map;
-    private MapFragment mapFragment;
     private Location mLastLocation;
     private LocationRequest locationRequest;
     private final int REQ_PERMISSION = 999;
-    private Marker locationMarker;
-    private Marker geoFenceMarker;
     private PendingIntent geoFencePendingIntent;
     private final int GEOFENCE_REQ_CODE = 0;
-    private Circle geoFenceLimits;
-    private boolean geofenceReadyForHouse;
-    private boolean geofenceReadyForApiClient;
+    private boolean atHouseCheckReadyForHouse;
+    private boolean atHouseCheckReadyForApiClient;
     private LatLng mHouseLatLng;
+    private DatabaseReference mCurrentRoommatePushRef;
+    private DatabaseReference roommateRef;
+    private boolean mAdapterTriggered;
+    private DatabaseReference houseRef;
 
 
     @Override
@@ -130,64 +110,62 @@ public class MainActivity extends AppCompatActivity implements
         createGoogleApi();
 
 
-        final DatabaseReference roommateRef = FirebaseDatabase
+        roommateRef = FirebaseDatabase
                 .getInstance()
                 .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
 
         DatabaseReference roommateChildRef = roommateRef.child(mUserId);
 
 
-        roommateChildRef.addValueEventListener(new ValueEventListener() {
+        roommateChildRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot roommateSnapshot) {
                 if (roommateSnapshot.exists()) {
                     mRoommate = roommateSnapshot.getValue(Roommate.class);
                     if (mRoommate.getHouseIds().size()>0){
                         mActiveHouseId = mRoommate.getHouseIds().get(0);
+                        //                        at this point we are only grabbing the first house associated with a roommate
                         Log.d("active user profile", mRoommate.getName());
-                        DatabaseReference houseRef = FirebaseDatabase
+                        houseRef = FirebaseDatabase
                                 .getInstance()
                                 .getReference(Constants.FIREBASE_CHILD_HOUSES)
                                 .child(mActiveHouseId);
-
-                        houseRef.addValueEventListener(new ValueEventListener() {
+//lets also add a child event listener here to retrigger all of this
+                        houseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot houseSnapshot) {
                                 if (houseSnapshot.exists()){
                                     mHouse = houseSnapshot.getValue(House.class);
 
-                                    geofenceReadyForHouse = true;
-                                    Log.d("house", mHouse.getName());
+                                    atHouseCheckReadyForHouse = true;
+                                    Log.d(TAG, "house location: Lat: " + mHouse.getLatitude() + ", Long: " + mHouse.getLongitude());
                                     mHouseLatLng = new LatLng(Double.parseDouble(mHouse.getLatitude()), Double.parseDouble(mHouse.getLongitude()));
-                                    if (geofenceReadyForHouse && geofenceReadyForApiClient){
-                                        startGeofence(mHouseLatLng);
+                                    if (atHouseCheckReadyForHouse && atHouseCheckReadyForApiClient){
+                                        checkIfCurrentUserAtHouse();
                                     }
-
-                                    mHouseName.setText(mHouse.getName()+ ":");
+                                    mHouseNameTextView.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
                                     ViewGroup.LayoutParams params = mActiveRoommatesListView.getLayoutParams();
                                     params.height = 225 * mActiveHouseInhabitantIds.size();
                                     mActiveRoommatesListView.setLayoutParams(params);
                                     Log.d(TAG, "set listview height");
+                                    mActiveHouseInhabitants.clear();
                                     for (int i=0; i< mActiveHouseInhabitantIds.size(); i++){
-                                        roommateRef.child(mActiveHouseInhabitantIds.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        roommateRef.child(mActiveHouseInhabitantIds.get(i)).addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot inhabitantSnapshot) {
                                                 if (inhabitantSnapshot.exists()){
                                                     Roommate activeHouseInhabitant = inhabitantSnapshot.getValue(Roommate.class);
-                                                    mActiveHouseInhabitants.add(activeHouseInhabitant);
-
-
-//                                                    TODO set each roommates geofence status here
-                                                    activeHouseInhabitant.isHome(true);
-
-
+                                                    int activeInhabitantListPosition = updateRoommateToHouse(activeHouseInhabitant);
                                                     if (mAdapter == null){
                                                         mAdapter = new InhabitantListAdapter(MainActivity.this, mActiveHouseInhabitants);
                                                         mActiveRoommatesListView.setAdapter(mAdapter);
                                                     } else{
+//                                                        notify add child if position is -1, notify itemchanged at i otherwise
                                                         mAdapter.notifyDataSetChanged();
+                                                        Log.d(TAG, "notifyDataSetChanged()");
                                                     }
+                                                    mAdapterTriggered = true;
                                                 }
 
                                             }
@@ -219,14 +197,17 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     mRoommate = new Roommate(mUsername, mUser.getUid());
                     mNoHousesTextView.setText("YOU DO NOT YET BELONG TO ANY HOUSES");
-                    DatabaseReference roommatePushRef = roommateRef.child(mRoommate.getRoommateId());
-                    roommatePushRef.setValue(mRoommate);
+                    mCurrentRoommatePushRef = roommateRef.child(mRoommate.getRoommateId());
+                    mCurrentRoommatePushRef.setValue(mRoommate);
                     Log.d("house retrieval: ", "profile just generated");
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+
+
+
     }
 
     @Override
@@ -284,11 +265,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "onConnected()");
-        geofenceReadyForApiClient = true;
+        atHouseCheckReadyForApiClient = true;
         startSendingLocation();
-        if (geofenceReadyForHouse && geofenceReadyForApiClient){
-            startGeofence(mHouseLatLng);
-        }
     }
 
     @Override
@@ -331,6 +309,9 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG, "LastKnown location. " +
                 "Lat: " + mLastLocation.getLatitude() +
                 " | Long: " + mLastLocation.getLongitude());
+        if (atHouseCheckReadyForHouse && atHouseCheckReadyForApiClient){
+            checkIfCurrentUserAtHouse();
+        }
     }
     
     private void startLocationUpdates(){
@@ -401,57 +382,44 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
-
-
-
-
-    private void startGeofence(LatLng geofenceLatLng) {
-        Log.i(TAG, "startGeofence()");
-        Geofence geofence = createGeofence( geofenceLatLng, Constants.GEOFENCE_RADIUS );
-        GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
-        addGeofence( geofenceRequest );
+    
+    public void checkIfCurrentUserAtHouse(){
+        Log.d(TAG, "checkIfCurrentUserAtHouse()");
+        if ((!Double.isNaN(mLastLocation.getLatitude()) && !Double.isNaN(mLastLocation.getLongitude())) && (mHouse.getLatitude().length()>0 && mHouse.getLatitude().length()>0)){
+            Double latDifference =  mHouseLatLng.latitude - mLastLocation.getLatitude();
+            Double longDifference =  mHouseLatLng.longitude - mLastLocation.getLongitude();
+            Log.d("latDifference", latDifference.toString());
+            Log.d("longDifference", longDifference.toString());
+            if ((latDifference <= Constants.HOUSE_FENCE_DISTANCE && latDifference >= -Constants.HOUSE_FENCE_DISTANCE) && (longDifference <= Constants.HOUSE_FENCE_DISTANCE && longDifference >= -Constants.HOUSE_FENCE_DISTANCE)){
+                mRoommate.isHome(true);
+                Log.d("changeHomeStatus", "true");
+            } else{
+                mRoommate.isHome(false);
+                Log.d("changeHomeStatus", "false");
+            }
+            mCurrentRoommatePushRef = roommateRef.child(mRoommate.getRoommateId());
+            mCurrentRoommatePushRef.child("atHome").setValue(mRoommate.getAtHome());
+            if (mAdapterTriggered){
+                mAdapter.notifyDataSetChanged();
+                Log.d("updateDataSet", "true");
+            }
+        }else{
+            Log.d(TAG, "some location data is incomplete for checking if home");
+        }
     }
 
-    private Geofence createGeofence( LatLng latLng, float radius ) {
-        Log.d(TAG, "createGeofence, Lat: " + latLng.latitude + ", Long: " + latLng.longitude);
-        return new Geofence.Builder()
-                .setRequestId(Constants.GEOFENCE_REQ_ID)
-                .setCircularRegion( latLng.latitude, latLng.longitude, radius)
-                .setExpirationDuration( Constants.GEO_DURATION )
-                .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
-                        | Geofence.GEOFENCE_TRANSITION_EXIT )
-                .build();
-
+    public int updateRoommateToHouse(Roommate activeInhabitant){
+        int position = -1;
+        for (int i=0; i < mActiveHouseInhabitants.size(); i++){
+            if (mActiveHouseInhabitants.get(i).getRoommateId().equals(activeInhabitant.getRoommateId())){
+                position = i;
+            }
+        }
+        if (position == -1){
+            mActiveHouseInhabitants.add(activeInhabitant);
+        } else{
+            mActiveHouseInhabitants.set(position, activeInhabitant);
+        }
+        return position;
     }
-
-    private GeofencingRequest createGeofenceRequest( Geofence geofence ) {
-        Log.d(TAG, "createGeofenceRequest");
-        return new GeofencingRequest.Builder()
-                .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
-                .addGeofence( geofence )
-//                add mGeofences list
-                .build();
-    }
-
-    private void addGeofence(GeofencingRequest request) {
-        Log.d(TAG, "addGeofence");
-        if (checkPermission())
-            LocationServices.GeofencingApi.addGeofences(
-                    googleApiClient,
-                    request,
-                    createGeofencePendingIntent()
-            ).setResultCallback(this);
-    }
-
-    private PendingIntent createGeofencePendingIntent() {
-        Log.d(TAG, "createGeofencePendingIntent");
-        if ( geoFencePendingIntent != null )
-            return geoFencePendingIntent;
-
-        Intent intent = new Intent( this, GeofenceTransitionService.class);
-        return PendingIntent.getService(
-                this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-    }
-
 }
