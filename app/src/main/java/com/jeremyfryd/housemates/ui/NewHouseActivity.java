@@ -115,7 +115,7 @@ public class NewHouseActivity extends AppCompatActivity implements
 
     private void generateCode() {
         String code = "";
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 6; i++){
             int randomNum = ThreadLocalRandom.current().nextInt(0, 35 + 1);
             if (randomNum < 10){
                 randomNum += 48;

@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements
                                     mHouseNameTextView.setText(mHouse.getName()+ ":");
                                     mActiveHouseInhabitantIds = mHouse.getRoommates();
                                     ViewGroup.LayoutParams params = mActiveRoommatesListView.getLayoutParams();
-                                    params.height = 225 * mActiveHouseInhabitantIds.size();
+                                    params.height = 250 * mActiveHouseInhabitantIds.size();
                                     mActiveRoommatesListView.setLayoutParams(params);
                                     Log.d(TAG, "set listview height");
                                     mActiveHouseInhabitants.clear();
