@@ -164,6 +164,7 @@ public class NewHouseActivity extends AppCompatActivity implements
         super.onStop();
     }
 
+//    TODO much of the location data code is repeated from MainActivity, modularize and DRY up this code
     public void findLocation(){
         if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             askForPermission(android.Manifest.permission.ACCESS_FINE_LOCATION,LOCATION);
@@ -182,7 +183,7 @@ public class NewHouseActivity extends AppCompatActivity implements
         }
         if (locationUpdated == false){
             if (mSharedPreferences.getString(Constants.PREFERENCES_LATITUDE_KEY, null) !=null && mSharedPreferences.getString(Constants.PREFERENCES_LONGITUDE_KEY, null)!= null){
-//                TODO this oughtta be a callback!
+//                TODO this oughtta be a cleaner callback
                 mLatitude = mSharedPreferences.getString(Constants.PREFERENCES_LATITUDE_KEY, null);
                 mLongitude = mSharedPreferences.getString(Constants.PREFERENCES_LONGITUDE_KEY, null);
                 mLatitudeTextView.setText("Latitude: " + mLatitude);

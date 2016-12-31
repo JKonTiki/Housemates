@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -22,8 +21,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,14 +75,11 @@ public class MainActivity extends AppCompatActivity implements
     private InhabitantListAdapter mAdapter;
     private List<String> mActiveHouseInhabitantIds;
     private List<Roommate> mActiveHouseInhabitants = new ArrayList<Roommate>();
-    private List<Geofence> mGeofenceList = new ArrayList<Geofence>();
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient googleApiClient;
     private Location mLastLocation;
     private LocationRequest locationRequest;
     private final int REQ_PERMISSION = 999;
-    private PendingIntent geoFencePendingIntent;
-    private final int GEOFENCE_REQ_CODE = 0;
     private boolean atHouseCheckReadyForHouse;
     private boolean atHouseCheckReadyForApiClient;
     private LatLng mHouseLatLng;
@@ -106,15 +100,12 @@ public class MainActivity extends AppCompatActivity implements
         mUserId = mUser.getUid();
         mUsername = mSharedPreferences.getString(Constants.PREFERENCES_USERNAME_KEY, null);
         createGoogleApi();
-
-
         roommateRef = FirebaseDatabase
                 .getInstance()
                 .getReference(Constants.FIREBASE_CHILD_ROOMMATES);
-
         DatabaseReference roommateChildRef = roommateRef.child(mUserId);
 
-
+//      our first call to the database: get roommate object based on authenticated user's ID
         roommateChildRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot roommateSnapshot) {
@@ -122,23 +113,24 @@ public class MainActivity extends AppCompatActivity implements
                     mRoommate = roommateSnapshot.getValue(Roommate.class);
                     if (mRoommate.getHouseIds().size()>0){
                         mActiveHouseId = mRoommate.getHouseIds().get(0);
-                        //                        at this point we are only grabbing the first house associated with a roommate
+//                        at this point we are only calling the first house associated with a roommate
                         Log.d("active user profile", mRoommate.getName());
                         houseRef = FirebaseDatabase
                                 .getInstance()
                                 .getReference(Constants.FIREBASE_CHILD_HOUSES)
                                 .child(mActiveHouseId);
-        // TODO also add a child event listener for the house that would add a corresponding new individual roommate event listener
+                        // TODO also add a child event listener for the house that would add a corresponding new individual roommate event listener
+//                        our second call through the database, we call the house object (currently just the first one chosen) associated with the roommate
                         houseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot houseSnapshot) {
                                 if (houseSnapshot.exists()){
                                     mHouse = houseSnapshot.getValue(House.class);
-
                                     atHouseCheckReadyForHouse = true;
                                     Log.d(TAG, "house location: Lat: " + mHouse.getLatitude() + ", Long: " + mHouse.getLongitude());
                                     mHouseLatLng = new LatLng(Double.parseDouble(mHouse.getLatitude()), Double.parseDouble(mHouse.getLongitude()));
                                     if (atHouseCheckReadyForHouse && atHouseCheckReadyForApiClient){
+//                                  we don't want to launch this function until we have both the user's location AND the house location
                                         checkIfCurrentUserAtHouse();
                                     }
                                     mHouseNameTextView.setText(mHouse.getName()+ ":");
@@ -149,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements
                                     Log.d(TAG, "set listview height");
                                     mActiveHouseInhabitants.clear();
                                     for (int i=0; i< mActiveHouseInhabitantIds.size(); i++){
+//                                        our third database call, this one attaches persisting listeners to all members of the house being displayed
                                         roommateRef.child(mActiveHouseInhabitantIds.get(i)).addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot inhabitantSnapshot) {
@@ -259,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-//TODO refactor this as a service running at all times
+//TODO refactor this as a service running on all activities
     private void startSendingLocation() {
         Log.d(TAG, "startSendingLocation()");
         getLastKnownLocation();
@@ -402,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
+//   the following bloc regards the Navigation drawer, which should also be refactored as a fragment for better readibility/resuability
     protected void createNavDrawer() {
         Log.d(TAG, "createNavDrawer()");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

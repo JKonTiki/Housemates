@@ -4,7 +4,7 @@
 Housemates was born of a simple question: _Are my roommates home?_ Whether it's a thought arising from sleepy isolation in your room or for having forgotten to turn off the stove, Housemates is intended to answer that question without needing to ask it. The application collects location data from users and, without divulging anything more, simply informs them of whether the roommates they've signed up with are home or not.
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Login Page Screenshot](Screenshots/LoginActivity.png?raw=true "Login Page")![Hom Page Screenshot](Screenshots/MainActivity.png?raw=true "Home Page")![Navigation Page Screenshot](Screenshots/NavDrawer.png?raw=true "Navigation Page")
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Login Page Screenshot](Screenshots/LoginActivity.png?raw=true "Login Page")![Hom Page Screenshot](Screenshots/MainActivity.png?raw=true "Home Page")![Navigation Page Screenshot](Screenshots/NavDrawer.png?raw=true "Navigation Page")
 
 
 ### Setup
@@ -69,12 +69,13 @@ Features to be added and improved:
 * [ChildEventListener](https://www.firebase.com/docs/java-api/javadoc/com/firebase/client/ChildEventListener.html) for list of user's roommates, which currently updates status of existing roommates but does not yet _live_ update new roommates added to their house
 * User's should not experience lag when the app calls to Firebase for data, so basically the MainActivity should more smoothly set its content view once data has been retrieved. Data should also be cached more efficiently
 * In the "Roommates" branch of the database, "atHome" should be recorded per house (through booleans in child houseId array), not as a general status of the roommate
+* Implement design for UseCodeActivity, GetCodeActivity, CreateAccountActivity, and particuarly NewHouseActivity
 * "Forgot Password" option for resetting password
 
 
 ### Potential for Expansion
 
-Housemates is meant to be simple, to not distract or deter by avoiding too many bells and whistles. That being said, any app that draws in users with guarantees of simplicity ought to also be ready to offer them the services they might hope to find in the same place. While Housemates' core premise is simple, it could certainly broaden itself to become more of a virtual hub for all matters of cohabitation (discussion, notes, bills, etc).
+Housemates is meant to be simple, to not distract or deter by avoiding too many bells and whistles. That being said, any app that draws in users with guarantees of simplicity ought to also be ready to offer them the services they might hope to find in the same place. If it attracted some sort of user base, it could certainly broaden itself later on to become more of a virtual hub for all matters of cohabitation (discussion, notes, bills, etc).
 
 
 ### Credits

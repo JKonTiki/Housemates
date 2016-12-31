@@ -130,21 +130,6 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         });
     }
 
-//    private void createFirebaseUserProfile(final FirebaseUser user) {
-//        UserProfileChangeRequest addProfileName = new UserProfileChangeRequest.Builder()
-//                .setDisplayName(mName)
-//                .build();
-//        user.updateProfile(addProfileName)
-//                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()) {
-//                            Log.d(TAG, user.getDisplayName());
-//                        }
-//                    }
-//                });
-//    }
-
     private void createAuthProgressDialog() {
         mAuthProgressDialog = new ProgressDialog(this);
         mAuthProgressDialog.setTitle("Loading...");

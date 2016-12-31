@@ -9,6 +9,9 @@ import java.util.List;
  * Created by jeremy on 12/20/16.
  */
 
+
+//TODO refactor 'atHome' as boolean corresponding to each HouseId
+//TODO add character avatar choice as a property of roommate object, so avatar choice displays universally
 @Parcel
 public class Roommate {
     public String name;

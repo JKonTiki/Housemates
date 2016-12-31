@@ -47,10 +47,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jeremyfryd.housemates.ui.MainActivity" />
         </activity>
-        <activity
-            android:name=".ui.NavActivity"
-            android:label="@string/title_activity_nav"
-            android:theme="@style/NoActionBarTheme"/>
     </application>
 
 </manifest>
