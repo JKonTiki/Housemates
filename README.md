@@ -4,7 +4,7 @@
 Housemates was born of a simple question: _Are my roommates home?_ Whether it's a thought arising from sleepy isolation in your room or for having forgotten to turn off the stove, Housemates is intended to answer that question without needing to ask it. The application collects location data from users and, without divulging anything more, simply informs them of whether the roommates they've signed up with are home or not.
 
 
-![Login Page Screenshot](Screenshots/LoginActivity.png?raw=true "Login Page")![Hom Page Screenshot](Screenshots/MainActivity.png?raw=true "Home Page")![Navigation Page Screenshot](Screenshots/NavDrawer.png?raw=true "Navigation Page")
+<center>![Login Page Screenshot](Screenshots/LoginActivity.png?raw=true "Login Page")![Hom Page Screenshot](Screenshots/MainActivity.png?raw=true "Home Page")![Navigation Page Screenshot](Screenshots/NavDrawer.png?raw=true "Navigation Page")</center>
 
 
 ### Setup
@@ -44,6 +44,7 @@ A simple and relatively accessible way to launch this app:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "RDssttmfyUaFzWLC0NuT1QvnXUZ2"
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "OpUJ7JGXNwOxGBPXyyZLNlYH7Cf2"
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "pvKbmNtkesQbVvI8Ds4UM5HHey12"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "oCoNBeTZp5e24k1fYjYFYIySHED2"
 
 - Roommates 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    - "9IdtpQ1NDmZUcTFFQZRou1Vk9aR2"
