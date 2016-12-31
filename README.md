@@ -1,7 +1,7 @@
 # Housemates
 
 
-Housemates was born of a simple question: _Are my roommates home?_ Whether it's a thought arising from sleepy isolation in your room or for having forgotten to turn off the stove, Housemates is intended to answer that question without needing to ask it. The application collects location data from users and, without divulging anything more, simply alerts them of whether the roommates they've signed up with are home or not.
+Housemates was born of a simple question: _Are my roommates home?_ Whether it's a thought arising from sleepy isolation in your room or for having forgotten to turn off the stove, Housemates is intended to answer that question without needing to ask it. The application collects location data from users and, without divulging anything more, simply informs them of whether the roommates they've signed up with are home or not.
 
 
 ### Setup
@@ -26,6 +26,29 @@ A simple and relatively accessible way to launch this app:
 * Users have the option to view a special passkey for the house that they belong to and click a button to share it via a preformatted text
 * Passkeys can be entered to join preexisting houses
 * any roommates' "at home" status will automatically update when they enter or leave the area declared as their house
+
+
+### Database Structure
+
+- Houses 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- GU2P9F
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • houseCode: "GU2P9F" 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • latitude: "38.8977" 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • longitude: "-77.0365"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • name: "The White House" 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        -  roommates 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "9IdtpQ1NDmZUcTFFQZRou1Vk9aR2"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "RDssttmfyUaFzWLC0NuT1QvnXUZ2"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "OpUJ7JGXNwOxGBPXyyZLNlYH7Cf2"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "pvKbmNtkesQbVvI8Ds4UM5HHey12"
+
+- Roommates 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    - "9IdtpQ1NDmZUcTFFQZRou1Vk9aR2"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • atHome: "true"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        -  houseIds 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            • "GU2P9F"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • name: "Barrack"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        • roommateId: "9IdtpQ1NDmZUcTFFQZRou1Vk9aR2" 
 
 
 ### Improvement Needed

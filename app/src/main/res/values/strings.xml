@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Housemates</string>
-    <string name="welcome">Come on in and track your pad</string>
+    <string name="welcome">Come on in and see who\'s home!</string>
     <string-array name="settings">
         <item>logout</item>
         <item>do</item>

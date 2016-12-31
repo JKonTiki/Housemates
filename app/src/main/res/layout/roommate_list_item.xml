@@ -38,7 +38,8 @@
         android:layout_gravity="right"
         android:visibility="gone"
         app:srcCompat="@android:drawable/presence_online"
-        android:id="@+id/isHomeIconTrue" />
+        android:id="@+id/isHomeIconTrue"
+        android:tint="@android:color/holo_green_light" />
 
 
 </LinearLayout>

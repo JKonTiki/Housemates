@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/colorSecondary"
+    android:background="@color/colorAccent"
     tools:context="com.jeremyfryd.housemates.ui.MainActivity">
     <ScrollView
         android:layout_width="fill_parent"
@@ -31,7 +31,8 @@
 
             <TextView
                 android:text=""
-                android:textSize="20dp"
+                android:textSize="28dp"
+                android:textStyle="bold"
                 android:textAlignment="center"
                 android:textColor="@color/colorPrimaryDark"
                 android:layout_width="wrap_content"
@@ -45,10 +46,10 @@
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/noHousesMessage"
-                android:layout_alignParentStart="true"
                 android:id="@+id/roommatesList"
-                android:layout_marginStart="13dp" />
+                android:layout_marginTop="18dp"
+                android:layout_below="@+id/noHousesMessage"
+                android:layout_alignParentStart="true" />
 
         </RelativeLayout>
     </ScrollView>
