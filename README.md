@@ -70,6 +70,7 @@ Features to be added and improved:
 * User's should not experience lag when the app calls to Firebase for data, so basically the MainActivity should more smoothly set its content view once data has been retrieved. Data should also be cached more efficiently
 * In the "Roommates" branch of the database, "atHome" should be recorded per house (through booleans in child houseId array), not as a general status of the roommate
 * Implement design for UseCodeActivity, GetCodeActivity, CreateAccountActivity, and particuarly NewHouseActivity
+* QR codes or something similar as an easy option to join the house of someone physically with a user
 * "Forgot Password" option for resetting password
 
 
@@ -82,5 +83,5 @@ Housemates is meant to be simple, to not distract or deter by avoiding too many 
 
 Many thanks to [this tutorial](https://code.tutsplus.com/tutorials/how-to-work-with-geofences-on-android--cms-26639) on constructing geofences, Google's spectacular documentation, and of course the infinite support of Stack Overflow. And Barrack Obama.
 
-This software is licensed under the MIT license.
+This software is protected under the MIT license.
 Copyright (c) 2016 Jeremy Fryd.
